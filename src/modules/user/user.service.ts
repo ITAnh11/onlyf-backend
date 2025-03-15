@@ -59,4 +59,13 @@ export class UserService {
 
     return new UserSerializer(user);
   }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (user && bcrypt.compareSync(password, user.password)) {
+      return user;
+    }
+    return null;
+  }
 }

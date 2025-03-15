@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
+import { RefreshToken } from './refresh-token.entity';
 
 @Entity()
 export class User {
@@ -42,12 +44,11 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({
-    nullable: true,
-  })
-  refreshToken: string;
-
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
   @JoinColumn()
   profile: UserProfile;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  @JoinColumn()
+  refreshTokens: RefreshToken[];
 }

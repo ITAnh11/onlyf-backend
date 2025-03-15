@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { UserProfile } from './entities/user-profile.entity';
 import { UserprofileModule } from './modules/userprofile/userprofile.module';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { UserprofileModule } from './modules/userprofile/userprofile.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, UserProfile],
+      entities: [User, UserProfile, RefreshToken],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
     AuthModule,

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres_onlyf
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=onlyf
+      - TZ=Asia/Ho_Chi_Minh
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"

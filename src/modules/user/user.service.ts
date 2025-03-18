@@ -21,6 +21,12 @@ export class UserService {
     });
   }
 
+  async findById(id: number | undefined) {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
   async create(userData: any) {
     const newUser = this.userRepository.create({
       email: userData.email,

@@ -1,8 +1,20 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CheckUniqueUserGuard } from 'src/guards/check-unique-user.guard';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
+import {
+  JwtAccessAuthGuard,
+  JwtRefreshAuthGuard,
+} from 'src/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,20 +29,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    return this.authService.login(req);
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('logout')
+  @UseGuards(JwtRefreshAuthGuard)
+  @Delete('logout')
   async logout(@Request() req) {
-    return new Promise<void>((resolve, reject) => {
-      req.logout((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    return this.authService.logout(req.user);
   }
 }

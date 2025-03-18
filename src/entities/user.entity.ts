@@ -48,7 +48,9 @@ export class User {
   @JoinColumn()
   profile: UserProfile;
 
-  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    cascade: true,
+  })
   @JoinColumn()
   refreshTokens: RefreshToken[];
 }

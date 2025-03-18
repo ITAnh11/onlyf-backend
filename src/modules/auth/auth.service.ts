@@ -1,32 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
+import { RefreshTokenService } from '../refresh_token/refresh_token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async register(user: any) {
     return this.userService.create(user);
   }
 
-  async login(user: any) {
-    const payload = { mail: user.mail, sub: user.id };
-
-    const access_token = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION,
-    });
-
-    const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION,
-    });
+  async login(req: any) {
+    const { accessToken, refreshToken } =
+      this.refreshTokenService.createTokenWhenLogin(req);
 
     return {
-      access_token,
-      refresh_token,
+      accessToken,
+      refreshToken,
     };
+  }
+
+  async logout(payload: any) {
+    return this.refreshTokenService.deleteRefreshToken(payload);
   }
 }

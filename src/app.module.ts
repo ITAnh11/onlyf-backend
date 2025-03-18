@@ -9,6 +9,7 @@ import { UserModule } from './modules/user/user.module';
 import { UserProfile } from './entities/user-profile.entity';
 import { UserprofileModule } from './modules/userprofile/userprofile.module';
 import { RefreshToken } from './entities/refresh-token.entity';
+import { RefreshTokenModule } from './modules/refresh_token/refresh_token.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
     AuthModule,
     UserModule,
     UserprofileModule,
+    RefreshTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

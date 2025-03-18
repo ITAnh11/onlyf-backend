@@ -8,20 +8,29 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from 'src/passports/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { JwtStrategy } from 'src/passports/jwt.strategy';
+import {
+  JwtAccessStrategy,
+  JwtRefreshStrategy,
+} from 'src/passports/jwt.strategy';
+import { RefreshTokenModule } from '../refresh_token/refresh_token.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     UserModule,
     UserprofileModule,
+    RefreshTokenModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-    }),
+    JwtModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, CheckUniqueUserGuard, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    CheckUniqueUserGuard,
+    LocalStrategy,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -15,7 +15,7 @@ export class AuthService {
 
   async login(req: any) {
     const { accessToken, refreshToken } =
-      this.refreshTokenService.createTokenWhenLogin(req);
+      await this.refreshTokenService.createTokenWhenLogin(req);
 
     return {
       accessToken,
@@ -24,6 +24,6 @@ export class AuthService {
   }
 
   async logout(payload: any) {
-    return this.refreshTokenService.deleteRefreshToken(payload);
+    return await this.refreshTokenService.deleteRefreshToken(payload);
   }
 }

@@ -32,11 +32,11 @@ export class RefreshTokenService {
     return { accessToken, refreshToken, createdAt };
   }
 
-  createTokenWhenLogin(req: any) {
+  async createTokenWhenLogin(req: any) {
     const user = req.user;
     const { accessToken, refreshToken, createdAt } = this.createNewToken(user);
 
-    this.saveNewRefreshToken(req, refreshToken, createdAt);
+    await this.saveNewRefreshToken(req, refreshToken, createdAt);
 
     return { accessToken, refreshToken };
   }

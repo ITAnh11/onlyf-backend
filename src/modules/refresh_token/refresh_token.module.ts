@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RefreshToken } from 'src/entities/refresh-token.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { RefreshTokenCronService } from './refresh-token-cron.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
     ConfigModule.forRoot(),
   ],
   controllers: [RefreshTokenController],
-  providers: [RefreshTokenService],
+  providers: [RefreshTokenService, RefreshTokenCronService],
   exports: [RefreshTokenService],
 })
 export class RefreshTokenModule {}

@@ -10,6 +10,7 @@ import { UserProfile } from './entities/user-profile.entity';
 import { UserprofileModule } from './modules/userprofile/userprofile.module';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { RefreshTokenModule } from './modules/refresh_token/refresh_token.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RefreshTokenModule } from './modules/refresh_token/refresh_token.module
       entities: [User, UserProfile, RefreshToken],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     UserprofileModule,

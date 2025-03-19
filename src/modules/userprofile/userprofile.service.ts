@@ -52,6 +52,9 @@ export class UserprofileService {
     await this.userProfileRepository.update(profile.id, data);
 
     return {
+      userProfile: await this.userProfileRepository.findOne({
+        where: { user: { id: user.userId } },
+      }),
       success: true,
       message: 'Profile updated successfully',
       statusCode: HttpStatus.OK,

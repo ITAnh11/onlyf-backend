@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProfile } from 'src/entities/user-profile.entity';
 import { Repository } from 'typeorm';
@@ -32,5 +37,24 @@ export class UserprofileService {
     });
 
     return profile;
+  }
+
+  async updateProfile(req: any, data: any) {
+    const user = req.user;
+    const profile = await this.userProfileRepository.findOne({
+      where: { user: { id: user.userId } },
+    });
+
+    if (!profile) {
+      return new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.userProfileRepository.update(profile.id, data);
+
+    return {
+      success: true,
+      message: 'Profile updated successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

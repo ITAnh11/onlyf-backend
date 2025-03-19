@@ -9,20 +9,19 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { CheckUniqueUserGuard } from 'src/guards/check-unique-user.guard';
+import { CheckUniqueEmailGuard } from 'src/guards/check-unique-email.guard';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
-import {
-  JwtAccessAuthGuard,
-  JwtRefreshAuthGuard,
-} from 'src/guards/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ConfirmPasswordGuard } from 'src/guards/confirm-password.guard';
+import { CheckUniqueUsernameGuard } from 'src/guards/check-unique-username.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @UseGuards(ConfirmPasswordGuard)
-  @UseGuards(CheckUniqueUserGuard)
+  @UseGuards(CheckUniqueUsernameGuard)
+  @UseGuards(CheckUniqueEmailGuard)
   @Post('register')
   async register(@Body() user: CreateUserDto) {
     return this.authService.register(user);

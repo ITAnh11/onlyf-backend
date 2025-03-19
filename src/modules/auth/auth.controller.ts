@@ -15,11 +15,13 @@ import {
   JwtAccessAuthGuard,
   JwtRefreshAuthGuard,
 } from 'src/guards/jwt-auth.guard';
+import { ConfirmPasswordGuard } from 'src/guards/confirm-password.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(ConfirmPasswordGuard)
   @UseGuards(CheckUniqueUserGuard)
   @Post('register')
   async register(@Body() user: CreateUserDto) {

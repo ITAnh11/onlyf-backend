@@ -42,8 +42,7 @@ export class UserService {
     await this.userRepository.save(newUser);
 
     await this.userProfileService.createProfile(newUser, {
-      username: userData.username,
-      name: userData.name,
+      ...userData,
     });
 
     return {
@@ -51,19 +50,6 @@ export class UserService {
       message: 'User created successfully',
       statusCode: HttpStatus.CREATED,
     };
-  }
-
-  async getUser(id: number): Promise<UserSerializer> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ['profile'],
-    });
-
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    return new UserSerializer(user);
   }
 
   async validateUser(email: string, password: string): Promise<any> {

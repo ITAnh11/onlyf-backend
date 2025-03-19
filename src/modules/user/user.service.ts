@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { UserSerializer } from './serializer/user.serializer';
 import { UserprofileService } from '../userprofile/userprofile.service';
 
 @Injectable()
@@ -59,5 +58,35 @@ export class UserService {
       return user;
     }
     return null;
+  }
+
+  async changePassword(req: any, passwordData: any) {
+    const user = await this.userRepository.findOneBy({ id: req.id });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const hashedPassword = await bcrypt.hashSync(
+      passwordData.password,
+      parseInt(process.env.SALT_ROUNDS || '10'),
+    );
+
+    user.password = hashedPassword;
+
+    await this.userRepository.save(user);
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

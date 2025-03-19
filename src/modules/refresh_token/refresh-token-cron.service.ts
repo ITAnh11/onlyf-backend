@@ -12,7 +12,7 @@ export class RefreshTokenCronService {
   ) {}
 
   // Chạy mỗi ngày lúc 23:42:00
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async deleteExpiredTokens() {
     console.log('Đang xóa refresh token hết hạn...');
 

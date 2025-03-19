@@ -38,5 +38,6 @@ export class RefreshToken {
   userAgent: string;
 
   @ManyToOne(() => User, (user) => user.refreshTokens)
+  @JoinColumn()
   user: User;
 }

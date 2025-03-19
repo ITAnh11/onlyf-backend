@@ -93,7 +93,7 @@ export class RefreshTokenService {
     const newCreatedAt = new Date();
     const payload = {
       email: user.email,
-      sub: user.id,
+      sub: user.userId,
       createdAt: newCreatedAt,
     };
 

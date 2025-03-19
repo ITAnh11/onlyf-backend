@@ -45,12 +45,10 @@ export class User {
   updatedAt: Date;
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
-  @JoinColumn()
   profile: UserProfile;
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
     cascade: true,
   })
-  @JoinColumn()
   refreshTokens: RefreshToken[];
 }

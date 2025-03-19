@@ -1,4 +1,5 @@
 import {
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -22,4 +23,8 @@ export class CreateUserDto {
       'Username must contain only letters, numbers, dots and underscores',
   })
   username: string;
+
+  @IsDateString()
+  @IsOptional()
+  dob: Date;
 }

@@ -5,23 +5,18 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { UserService } from 'src/modules/user/user.service';
 import { UserprofileService } from 'src/modules/userprofile/userprofile.service';
 
 @Injectable()
-export class CheckUniqueUserGuard implements CanActivate {
-  constructor(
-    private readonly userService: UserService,
-    private readonly userProfileService: UserprofileService,
-  ) {}
+export class CheckUniqueUsernameGuard implements CanActivate {
+  constructor(private readonly userProfileService: UserprofileService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { email, username } = request.body;
+    const { username } = request.body;
 
-    // Kiểm tra email đã tồn tại chưa
-    if (await this.userService.findByEmail(email)) {
-      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    if (!username) {
+      return true;
     }
 
     // Kiểm tra username đã tồn tại chưa

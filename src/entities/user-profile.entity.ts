@@ -36,5 +36,6 @@ export class UserProfile {
   avatar: string;
 
   @OneToOne(() => User, (user) => user.profile)
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

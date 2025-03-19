@@ -12,11 +12,4 @@ import { JwtAccessAuthGuard } from 'src/guards/jwt-auth.guard';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get('/:id')
-  async getUser(@Param('id') id: number) {
-    return this.userService.getUser(id);
-  }
 }

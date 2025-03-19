@@ -24,4 +24,13 @@ export class UserprofileService {
       where: { username },
     });
   }
+
+  async getProfile(req: any) {
+    const user = req.user;
+    const profile = await this.userProfileRepository.findOne({
+      where: { user: { id: user.userId } },
+    });
+
+    return profile;
+  }
 }

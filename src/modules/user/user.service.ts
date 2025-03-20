@@ -74,14 +74,14 @@ export class UserService {
       );
     }
 
-    const hashedPassword = await bcrypt.hashSync(
+    const hashedPassword = bcrypt.hashSync(
       passwordData.password,
       parseInt(process.env.SALT_ROUNDS || '10'),
     );
 
     user.password = hashedPassword;
 
-    await this.userRepository.save(user);
+    await this.userRepository.update(user.id, user);
 
     return {
       success: true,

@@ -81,7 +81,7 @@ export class UserService {
 
     user.password = hashedPassword;
 
-    await this.userRepository.save(user);
+    await this.userRepository.update(user.id, user);
 
     return {
       success: true,

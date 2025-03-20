@@ -148,7 +148,7 @@ export class RefreshTokenService {
         newRefreshToken,
         parseInt(process.env.SALT_ROUNDS || '10'),
       ),
-      createdAt,
+      createdAt: newCreatedAt,
     });
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };

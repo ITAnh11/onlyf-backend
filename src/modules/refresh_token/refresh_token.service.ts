@@ -193,4 +193,17 @@ export class RefreshTokenService {
 
     return refreshTokens;
   }
+
+  async validateRefreshToken(payload: any, refreshToken: string) {
+    const { userId, createdAt } = payload;
+    const refreshTokenEntity = await this.refreshTokenRepository.findOne({
+      where: { user: { id: userId }, createdAt: new Date(createdAt) },
+    });
+
+    if (!refreshTokenEntity) {
+      return false;
+    }
+
+    return bcrypt.compare(refreshToken, refreshTokenEntity.refreshToken);
+  }
 }

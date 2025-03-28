@@ -26,4 +26,23 @@ export class AuthService {
   async logout(payload: any) {
     return await this.refreshTokenService.deleteRefreshToken(payload);
   }
+
+  async isLoggedIn(req: any) {
+    const payload = req.user;
+    const refreshToken = req.headers['authorization']?.split(' ')[1];
+    const result = await this.refreshTokenService.validateRefreshToken(
+      payload,
+      refreshToken,
+    );
+
+    if (result) {
+      return {
+        isLoggedIn: true,
+      };
+    }
+
+    return {
+      isLoggedIn: false,
+    };
+  }
 }

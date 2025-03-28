@@ -38,4 +38,10 @@ export class AuthController {
   async logout(@Request() req) {
     return this.authService.logout(req.user);
   }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Get('is-logged-in')
+  async isLoggedIn(@Request() req) {
+    return this.authService.isLoggedIn(req);
+  }
 }

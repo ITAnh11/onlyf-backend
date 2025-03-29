@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +9,7 @@ import {
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { Post } from './post.entity';
 
 @Entity()
 export class User {
@@ -51,4 +51,7 @@ export class User {
     cascade: true,
   })
   refreshTokens: RefreshToken[];
+
+  @OneToMany(() => Post, (post) => post.user, { cascade: true })
+  posts: Post[];
 }

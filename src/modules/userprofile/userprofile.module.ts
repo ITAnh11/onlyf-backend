@@ -3,10 +3,10 @@ import { UserprofileService } from './userprofile.service';
 import { UserprofileController } from './userprofile.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserProfile } from 'src/entities/user-profile.entity';
-import { UserModule } from '../user/user.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserProfile])],
+  imports: [TypeOrmModule.forFeature([UserProfile]), FirebaseModule],
   providers: [UserprofileService],
   controllers: [UserprofileController],
   exports: [UserprofileService],

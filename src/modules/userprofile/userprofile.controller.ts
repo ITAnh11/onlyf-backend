@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Request,
@@ -26,5 +27,17 @@ export class UserprofileController {
   @Post('update-profile')
   updateProfile(@Request() req, @Body() data: UpdateUserDto) {
     return this.userprofileService.updateProfile(req, data);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Post('update-avatar')
+  updateAvatar(@Request() req, @Body() data) {
+    return this.userprofileService.updateAvatar(req, data);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete('delete-avatar')
+  deleteAvatar(@Request() req) {
+    return this.userprofileService.deleteAvatar(req);
   }
 }

@@ -33,7 +33,12 @@ export class UserProfile {
   @Column({
     nullable: true,
   })
-  avatar: string;
+  urlPublicAvatar: string;
+
+  @Column({
+    nullable: true,
+  })
+  pathAvatar: string;
 
   @OneToOne(() => User, (user) => user.profile)
   @JoinColumn({ name: 'userId' })

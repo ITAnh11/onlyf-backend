@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { stat } from 'fs';
 import { Post } from 'src/entities/post.entity';
 import { Repository } from 'typeorm';
 
@@ -11,7 +12,7 @@ export class PostService {
   ) {}
 
   async createPost(req: any, data: any): Promise<Post> {
-    const userId = req.user.id; // Assuming req.user contains the user object
+    const userId = req.user.userId; // Assuming req.user contains the user object
     const newPost = this.postRepository.create({
       caption: data.caption,
       urlPublicImage: data.urlPublicImage,
@@ -26,7 +27,7 @@ export class PostService {
   }
 
   async getMyPosts(req: any): Promise<Post[]> {
-    const userId = req.user.id; // Assuming req.user contains the user object
+    const userId = req.user.userId; // Assuming req.user contains the user object
     try {
       return await this.postRepository.find({
         where: { user: { id: userId } },
@@ -34,6 +35,29 @@ export class PostService {
       });
     } catch (error) {
       throw new Error('Error fetching posts: ' + error.message);
+    }
+  }
+
+  async deletePost(req: any, data: any) {
+    const userId = req.user.userId;
+    try {
+      const result = await this.postRepository.delete({
+        id: data.id,
+        user: { id: userId }, // Sử dụng điều kiện đơn giản
+      });
+
+      if (result.affected === 0) {
+        throw new Error(
+          'Post not found or you do not have permission to delete it.',
+        );
+      }
+
+      return {
+        message: 'Post deleted successfully',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new Error('Error deleting post: ' + error.message);
     }
   }
 }

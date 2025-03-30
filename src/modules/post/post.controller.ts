@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Request,
@@ -24,5 +25,11 @@ export class PostController {
   async getMyPosts(@Request() req) {
     // Logic to get a post
     return this.postService.getMyPosts(req);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete('delete')
+  async deletePost(@Request() req, @Body() data: any) {
+    return this.postService.deletePost(req, data);
   }
 }

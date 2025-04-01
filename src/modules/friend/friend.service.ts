@@ -1,0 +1,202 @@
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  FriendRequest,
+  FriendRequestStatus,
+} from 'src/entities/friend-request.entity';
+import { Friend } from 'src/entities/friend.entity';
+import { User } from 'src/entities/user.entity';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class FriendService {
+  constructor(
+    @InjectRepository(Friend)
+    private readonly friendRepository: Repository<Friend>,
+
+    @InjectRepository(FriendRequest)
+    private readonly friendRequestRepository: Repository<FriendRequest>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async sendFriendRequest(req: any, data: any): Promise<FriendRequest> {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    const receiverId = data.receiverId; // Assuming the receiver ID is passed in the request body
+
+    const existingRequest = await this.friendRequestRepository.findOne({
+      where: {
+        sender: { id: userId },
+        receiver: { id: receiverId },
+      },
+    });
+
+    if (existingRequest) {
+      if (existingRequest.status === FriendRequestStatus.ACCEPTED) {
+        throw new HttpException(
+          'You are already friends with this user.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (existingRequest.status === FriendRequestStatus.PENDING) {
+        throw new HttpException(
+          'Friend request already sent.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (existingRequest.status === FriendRequestStatus.REJECTED) {
+        // If the request was rejected, we can create a new one
+        await this.friendRequestRepository.remove(existingRequest);
+      }
+    }
+
+    const receiver = await this.userRepository.findOne({
+      where: { id: receiverId },
+    });
+    if (!receiver) {
+      throw new HttpException('Receiver not found.', HttpStatus.NOT_FOUND);
+    }
+    if (receiverId === userId) {
+      throw new HttpException(
+        'You cannot send a friend request to yourself.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const newFriendRequest = this.friendRequestRepository.create({
+      sender: { id: userId },
+      receiver: { id: receiverId },
+    });
+    try {
+      return await this.friendRequestRepository.save(newFriendRequest);
+    } catch (error) {
+      throw new Error('Error sending friend request: ' + error.message);
+    }
+  }
+
+  async acceptFriendRequest(req: any, data: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    const requestId = data.requestId; // Assuming the request ID is passed in the request body
+
+    try {
+      const friendRequest = await this.friendRequestRepository.findOne({
+        where: { id: requestId, receiver: { id: userId } },
+        relations: ['sender', 'receiver'],
+      });
+
+      if (!friendRequest) {
+        throw new HttpException(
+          'Friend request not found or you do not have permission to accept it.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (friendRequest.status !== FriendRequestStatus.PENDING) {
+        throw new HttpException(
+          'Friend request is not pending.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const newFriend1 = this.friendRepository.create({
+        user: { id: userId },
+        friend: { id: friendRequest.sender.id },
+      });
+      const newFriend2 = this.friendRepository.create({
+        user: { id: friendRequest.sender.id },
+        friend: { id: userId },
+      });
+
+      await this.friendRepository.save(newFriend1);
+      await this.friendRepository.save(newFriend2);
+      await this.friendRequestRepository.update(requestId, {
+        status: FriendRequestStatus.ACCEPTED,
+      });
+
+      return {
+        message: 'Friend request accepted successfully',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new Error('Error accepting friend request: ' + error.message);
+    }
+  }
+
+  async rejectFriendRequest(req: any, data: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    const requestId = data.requestId; // Assuming the request ID is passed in the request body
+
+    try {
+      const friendRequest = await this.friendRequestRepository.findOne({
+        where: { id: requestId, receiver: { id: userId } },
+      });
+
+      if (!friendRequest) {
+        throw new HttpException(
+          'Friend request not found or you do not have permission to reject it.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (friendRequest.status !== FriendRequestStatus.PENDING) {
+        throw new HttpException(
+          'Friend request is not pending.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.friendRequestRepository.update(requestId, {
+        status: FriendRequestStatus.REJECTED,
+      });
+
+      return {
+        message: 'Friend request rejected successfully',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new Error('Error rejecting friend request: ' + error.message);
+    }
+  }
+
+  async getFriendRequests(req: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    try {
+      return await this.friendRequestRepository
+        .createQueryBuilder('friendRequest')
+        .leftJoinAndSelect('friendRequest.sender', 'sender') // Lấy thông tin người gửi từ bảng User
+        .leftJoinAndSelect('sender.profile', 'profile') // Lấy thông tin từ bảng UserProfile
+        .where('friendRequest.receiver.id = :userId', { userId }) // Điều kiện: người nhận là bạn
+        .andWhere('friendRequest.status = :status', {
+          status: FriendRequestStatus.PENDING,
+        }) // Chỉ lấy yêu cầu đang chờ xử lý
+        .select([
+          'friendRequest.id', // Chỉ định các trường cần lấy
+          'friendRequest.status',
+          'profile.name',
+          'profile.urlPublicAvatar', // Giả sử bạn có trường avatarUrl trong UserProfile
+          'friendRequest.createdAt', // Thêm trường createdAt từ bảng FriendRequest
+          'sender.id', // Thêm trường id từ bảng User
+        ])
+        .orderBy('friendRequest.createdAt', 'DESC') // Sắp xếp theo thời gian tạo
+        .getMany();
+    } catch (error) {
+      throw new Error('Error fetching friend requests: ' + error.message);
+    }
+  }
+
+  async getFriends(req: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    try {
+      return await this.friendRepository
+        .createQueryBuilder('friend')
+        .leftJoinAndSelect('friend.friend', 'friendUser')
+        .leftJoinAndSelect('friendUser.profile', 'profile')
+        .where('friend.user.id = :userId', { userId })
+        .select(['friendUser.id', 'profile.name', 'profile.urlPublicAvatar'])
+        .getMany();
+    } catch (error) {
+      throw new Error('Error fetching friends: ' + error.message);
+    }
+  }
+}

@@ -13,6 +13,9 @@ import { RefreshTokenModule } from './modules/refresh_token/refresh_token.module
 import { ScheduleModule } from '@nestjs/schedule';
 import { PostModule } from './modules/post/post.module';
 import { Post } from './entities/post.entity';
+import { FriendModule } from './modules/friend/friend.module';
+import { Friend } from './entities/friend.entity';
+import { FriendRequest } from './entities/friend-request.entity';
 
 @Module({
   imports: [
@@ -24,7 +27,7 @@ import { Post } from './entities/post.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, UserProfile, RefreshToken, Post],
+      entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
     ScheduleModule.forRoot(),
@@ -33,6 +36,7 @@ import { Post } from './entities/post.entity';
     UserprofileModule,
     RefreshTokenModule,
     PostModule,
+    FriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],

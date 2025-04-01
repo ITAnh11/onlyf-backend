@@ -10,6 +10,8 @@ import {
 import { UserProfile } from './user-profile.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { Post } from './post.entity';
+import { Friend } from './friend.entity';
+import { FriendRequest } from './friend-request.entity';
 
 @Entity()
 export class User {
@@ -54,4 +56,16 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user, { cascade: true })
   posts: Post[];
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.sender)
+  sentRequests: FriendRequest[];
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.receiver)
+  receivedRequests: FriendRequest[];
+
+  @OneToMany(() => Friend, (friend) => friend.user)
+  friends: Friend[];
+
+  @OneToMany(() => Friend, (friend) => friend.friend)
+  friendOf: Friend[];
 }

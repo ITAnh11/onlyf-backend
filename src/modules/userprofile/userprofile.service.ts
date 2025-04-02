@@ -32,6 +32,17 @@ export class UserprofileService {
     const user = req.user;
     const profile = await this.userProfileRepository.findOne({
       where: { user: { id: user.userId } },
+      relations: ['user'],
+      select: {
+        id: true,
+        user: { id: true, email: true },
+        username: true,
+        name: true,
+        dob: true,
+        phone: true,
+        urlPublicAvatar: true,
+        pathAvatar: true,
+      },
     });
 
     return profile;

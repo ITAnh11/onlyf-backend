@@ -169,8 +169,8 @@ export class RefreshTokenService {
     return new HttpException('Logout success', HttpStatus.OK);
   }
 
-  async deleteDevice(req: any) {
-    const id = req.body.id;
+  async deleteDevice(req: any, query: any) {
+    const id = query.deviceId; // Assuming the device ID is passed in the request body
     const userId = req.user.userId;
     const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({
       id,

@@ -4,11 +4,13 @@ import {
   Delete,
   Get,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAccessAuthGuard } from 'src/guards/jwt-auth.guard';
+import { query } from 'express';
 
 @Controller('post')
 export class PostController {
@@ -29,7 +31,7 @@ export class PostController {
 
   @UseGuards(JwtAccessAuthGuard)
   @Delete('delete')
-  async deletePost(@Request() req, @Body() data: any) {
-    return this.postService.deletePost(req, data);
+  async deletePost(@Request() req, @Query() query: any) {
+    return this.postService.deletePost(req, query);
   }
 }

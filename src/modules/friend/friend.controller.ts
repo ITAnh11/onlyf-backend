@@ -56,4 +56,9 @@ export class FriendController {
   async getFriends(@Request() req) {
     return this.friendService.getFriends(req);
   }
+
+  @Get('search-user')
+  async searchUser(@Query('username') username: string) {
+    return await this.friendService.searchUser(username);
+  }
 }

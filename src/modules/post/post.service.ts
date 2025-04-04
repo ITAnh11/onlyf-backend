@@ -38,11 +38,12 @@ export class PostService {
     }
   }
 
-  async deletePost(req: any, data: any) {
+  async deletePost(req: any, query: any) {
     const userId = req.user.userId;
+    const postId = query.postId; // Assuming the post ID is passed in the request body
     try {
       const result = await this.postRepository.delete({
-        id: data.id,
+        id: postId,
         user: { id: userId }, // Sử dụng điều kiện đơn giản
       });
 

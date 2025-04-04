@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   JwtAccessAuthGuard,
   JwtRefreshAuthGuard,
@@ -17,8 +24,8 @@ export class RefreshTokenController {
 
   @UseGuards(JwtAccessAuthGuard)
   @Post('delete-device')
-  async deleteDevice(@Request() req) {
-    return this.refreshTokenService.deleteDevice(req);
+  async deleteDevice(@Request() req, @Query() query: any) {
+    return this.refreshTokenService.deleteDevice(req, query);
   }
 
   @UseGuards(JwtAccessAuthGuard)

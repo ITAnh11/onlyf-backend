@@ -22,9 +22,4 @@ export class UserController {
   async changePassword(@Req() req, @Body() data: PasswordDto) {
     return await this.userService.changePassword(req.user, data);
   }
-
-  @Get('search-user')
-  async searchUser(@Query('username') username: string) {
-    return await this.userService.searchUser(username);
-  }
 }

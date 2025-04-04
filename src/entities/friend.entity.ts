@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Unique,
+  CreateDateColumn,
+  Column,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -9,6 +16,14 @@ export class Friend {
 
   @ManyToOne(() => User, (user) => user.friends)
   user: User;
+
+  @Column({
+    default: false,
+  })
+  isBlocked: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.friendOf)
   friend: User;

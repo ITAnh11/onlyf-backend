@@ -89,8 +89,4 @@ export class UserService {
       statusCode: HttpStatus.OK,
     };
   }
-
-  async searchUser(username: string) {
-    return await this.userProfileService.searchUser(username);
-  }
 }

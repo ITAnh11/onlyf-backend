@@ -7,6 +7,7 @@ import {
 import { Friend } from 'src/entities/friend.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
+import { UserprofileService } from '../userprofile/userprofile.service';
 
 @Injectable()
 export class FriendService {
@@ -19,6 +20,8 @@ export class FriendService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    private readonly userProfileService: UserprofileService,
   ) {}
 
   async sendFriendRequest(req: any, query: any): Promise<FriendRequest> {
@@ -249,13 +252,23 @@ export class FriendService {
     try {
       return await this.friendRepository
         .createQueryBuilder('friend')
-        .leftJoinAndSelect('friend.friend', 'friendUser')
-        .leftJoinAndSelect('friendUser.profile', 'profile')
-        .where('friend.user.id = :userId', { userId })
-        .select(['friendUser.id', 'profile.name', 'profile.urlPublicAvatar'])
+        .leftJoinAndSelect('friend.friend', 'friendUser') // Lấy thông tin người bạn từ bảng User
+        .leftJoinAndSelect('friendUser.profile', 'profile') // Lấy thông tin từ bảng UserProfile
+        .where('friend.user.id = :userId', { userId }) // Điều kiện: người dùng là bạn
+        .select([
+          'friend.id',
+          'profile.name',
+          'profile.urlPublicAvatar',
+          'friendUser.id',
+        ])
+        .orderBy('friend.createdAt', 'DESC') // Sắp xếp theo thời gian tạo
         .getMany();
     } catch (error) {
       throw new Error('Error fetching friends: ' + error.message);
     }
+  }
+
+  async searchUser(username: string) {
+    return await this.userProfileService.searchUser(username);
   }
 }

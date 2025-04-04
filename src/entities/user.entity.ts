@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  In,
+  Index,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,12 +18,14 @@ import { FriendRequest } from './friend-request.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
+  @Index()
   id: number;
 
   @Column({
     unique: true,
     nullable: false,
   })
+  @Index({ fulltext: true })
   email: string;
 
   @Column({

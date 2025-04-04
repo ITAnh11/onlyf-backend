@@ -112,4 +112,27 @@ export class UserprofileService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  async searchUser(username: string) {
+    const users = await this.userProfileRepository
+      .createQueryBuilder('userProfile')
+      .leftJoinAndSelect('userProfile.user', 'user')
+      .where('userProfile.username ILIKE :username', {
+        username: `${username}%`,
+      })
+      .select([
+        'userProfile.name',
+        'userProfile.username',
+        'userProfile.urlPublicAvatar',
+        'user.id',
+      ])
+      .limit(10)
+      .getMany();
+
+    if (users.length === 0) {
+      return new HttpException('No users found', HttpStatus.NOT_FOUND);
+    }
+
+    return users;
+  }
 }

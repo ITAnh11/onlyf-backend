@@ -21,9 +21,9 @@ export class FriendService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async sendFriendRequest(req: any, data: any): Promise<FriendRequest> {
+  async sendFriendRequest(req: any, query: any): Promise<FriendRequest> {
     const userId = req.user.userId; // Assuming req.user contains the user object
-    const receiverId = data.receiverId; // Assuming the receiver ID is passed in the request body
+    const receiverId = parseInt(query.receiverId); // Assuming the receiver ID is passed in the request body
 
     const existingRequest = await this.friendRequestRepository.findOne({
       where: {
@@ -75,9 +75,9 @@ export class FriendService {
     }
   }
 
-  async acceptFriendRequest(req: any, data: any) {
+  async acceptFriendRequest(req: any, query: any) {
     const userId = req.user.userId; // Assuming req.user contains the user object
-    const requestId = data.requestId; // Assuming the request ID is passed in the request body
+    const requestId = parseInt(query.requestId); // Assuming the request ID is passed in the request body
 
     try {
       const friendRequest = await this.friendRequestRepository.findOne({
@@ -123,9 +123,9 @@ export class FriendService {
     }
   }
 
-  async rejectFriendRequest(req: any, data: any) {
+  async rejectFriendRequest(req: any, query: any) {
     const userId = req.user.userId; // Assuming req.user contains the user object
-    const requestId = data.requestId; // Assuming the request ID is passed in the request body
+    const requestId = parseInt(query.requestId); // Assuming the request ID is passed in the request body
 
     try {
       const friendRequest = await this.friendRequestRepository.findOne({
@@ -159,6 +159,39 @@ export class FriendService {
     }
   }
 
+  async revokeFriendRequest(req: any, query: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    const requestId = parseInt(query.requestId); // Assuming the request ID is passed in the request body
+    try {
+      const friendRequest = await this.friendRequestRepository.findOne({
+        where: { id: requestId, sender: { id: userId } },
+      });
+
+      if (!friendRequest) {
+        throw new HttpException(
+          'Friend request not found or you do not have permission to revoke it.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (friendRequest.status !== FriendRequestStatus.PENDING) {
+        throw new HttpException(
+          'Friend request is not pending.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.friendRequestRepository.remove(friendRequest);
+
+      return {
+        message: 'Friend request revoked successfully',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new Error('Error revoking friend request: ' + error.message);
+    }
+  }
+
   async getFriendRequests(req: any) {
     const userId = req.user.userId; // Assuming req.user contains the user object
     try {
@@ -182,6 +215,32 @@ export class FriendService {
         .getMany();
     } catch (error) {
       throw new Error('Error fetching friend requests: ' + error.message);
+    }
+  }
+
+  async getSentFriendRequests(req: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    try {
+      return await this.friendRequestRepository
+        .createQueryBuilder('friendRequest')
+        .leftJoinAndSelect('friendRequest.receiver', 'receiver') // Lấy thông tin người nhận từ bảng User
+        .leftJoinAndSelect('receiver.profile', 'profile') // Lấy thông tin từ bảng UserProfile
+        .where('friendRequest.sender.id = :userId', { userId }) // Điều kiện: người gửi là bạn
+        .andWhere('friendRequest.status = :status', {
+          status: FriendRequestStatus.PENDING,
+        }) // Chỉ lấy yêu cầu đang chờ xử lý
+        .select([
+          'friendRequest.id', // Chỉ định các trường cần lấy
+          'friendRequest.status',
+          'profile.name',
+          'profile.urlPublicAvatar', // Giả sử bạn có trường avatarUrl trong UserProfile
+          'friendRequest.createdAt', // Thêm trường createdAt từ bảng FriendRequest
+          'receiver.id', // Thêm trường id từ bảng User
+        ])
+        .orderBy('friendRequest.createdAt', 'DESC') // Sắp xếp theo thời gian tạo
+        .getMany();
+    } catch (error) {
+      throw new Error('Error fetching sent friend requests: ' + error.message);
     }
   }
 

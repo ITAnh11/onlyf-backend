@@ -112,22 +112,19 @@ export class PostService {
       .orderBy('posts.createdAt', 'DESC')
       .take(parsedLimit + 1); // Fetch one extra post to check for hasMore
 
-    if (cursor) {
-      qb.andWhere('posts.createdAt < :cursor', {
-        cursor: new Date(cursor),
-      });
-    }
-
     if (friendId) {
-      qb.andWhere('user.id = :friendId AND friend.id = :userId', {
+      qb.where('user.id = :friendId AND friend.id = :userId', {
         friendId,
         userId,
       });
     } else {
-      qb.andWhere('friend.id = :userId', { userId }).orWhere(
-        'user.id = :userId',
-        { userId },
-      );
+      qb.where('(friend.id = :userId OR user.id = :userId)', { userId });
+    }
+
+    if (cursor) {
+      qb.andWhere('posts.createdAt < :cursor', {
+        cursor: new Date(cursor),
+      });
     }
 
     qb.select([

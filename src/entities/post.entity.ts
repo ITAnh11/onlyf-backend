@@ -31,9 +31,7 @@ export class Post {
   pathImage: string;
 
   @CreateDateColumn()
-  @Index({
-    fulltext: true,
-  })
+  @Index()
   createdAt: Date;
 
   @UpdateDateColumn()

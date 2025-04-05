@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -41,6 +40,6 @@ export class UserProfile {
   pathAvatar: string;
 
   @OneToOne(() => User, (user) => user.profile)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn()
   user: User;
 }

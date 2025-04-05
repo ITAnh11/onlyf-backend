@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -30,6 +31,9 @@ export class Post {
   pathImage: string;
 
   @CreateDateColumn()
+  @Index({
+    fulltext: true,
+  })
   createdAt: Date;
 
   @UpdateDateColumn()

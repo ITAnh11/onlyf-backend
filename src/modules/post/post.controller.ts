@@ -24,14 +24,20 @@ export class PostController {
 
   @UseGuards(JwtAccessAuthGuard)
   @Get('get-my-posts')
-  async getMyPosts(@Request() req) {
+  async getMyPosts(@Request() req, @Query() query: any) {
     // Logic to get a post
-    return this.postService.getMyPosts(req);
+    return this.postService.getMyPosts(req, query);
   }
 
   @UseGuards(JwtAccessAuthGuard)
   @Delete('delete')
   async deletePost(@Request() req, @Query() query: any) {
     return this.postService.deletePost(req, query);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('get-posts')
+  async getPosts(@Request() req, @Query() query: any) {
+    return this.postService.getPosts(req, query);
   }
 }

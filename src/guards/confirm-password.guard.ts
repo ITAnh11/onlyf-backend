@@ -5,8 +5,6 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { UserService } from 'src/modules/user/user.service';
-import { UserprofileService } from 'src/modules/userprofile/userprofile.service';
 
 @Injectable()
 export class ConfirmPasswordGuard implements CanActivate {

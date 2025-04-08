@@ -66,8 +66,13 @@ export class RefreshTokenService {
 
   async saveNewRefreshToken(req: any, refreshToken: string, createdAt: Date) {
     const userAgent = req.headers['user-agent'];
-    const deviceName = req.body.deviceName;
+    const deviceInfo = req.body.deviceInfo;
     const userId = req.user.id;
+
+    const deviceName = deviceInfo
+      ? deviceInfo.brand + ' ' + deviceInfo.model
+      : 'Unknown Device';
+
     const newRefreshToken = this.refreshTokenRepository.create({
       user: { id: userId },
       refreshToken: bcrypt.hashSync(
@@ -81,7 +86,7 @@ export class RefreshTokenService {
           ),
       ),
       createdAt,
-      deviceName,
+      deviceName: deviceInfo.brand + ' ' + deviceInfo.model,
       userAgent,
     });
 

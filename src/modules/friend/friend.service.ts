@@ -210,6 +210,7 @@ export class FriendService {
           'friendRequest.id', // Chỉ định các trường cần lấy
           'friendRequest.status',
           'profile.name',
+          'profile.username',
           'profile.urlPublicAvatar', // Giả sử bạn có trường avatarUrl trong UserProfile
           'friendRequest.createdAt', // Thêm trường createdAt từ bảng FriendRequest
           'sender.id', // Thêm trường id từ bảng User
@@ -236,6 +237,7 @@ export class FriendService {
           'friendRequest.id', // Chỉ định các trường cần lấy
           'friendRequest.status',
           'profile.name',
+          'profile.username',
           'profile.urlPublicAvatar', // Giả sử bạn có trường avatarUrl trong UserProfile
           'friendRequest.createdAt', // Thêm trường createdAt từ bảng FriendRequest
           'receiver.id', // Thêm trường id từ bảng User
@@ -258,6 +260,7 @@ export class FriendService {
         .select([
           'friend.id',
           'profile.name',
+          'profile.username',
           'profile.urlPublicAvatar',
           'friendUser.id',
         ])
@@ -270,5 +273,37 @@ export class FriendService {
 
   async searchUser(username: string) {
     return await this.userProfileService.searchUser(username);
+  }
+
+  async unfriend(req: any, query: any) {
+    const userId = req.user.userId; // Assuming req.user contains the user object
+    const friendId = parseInt(query.friendId); // Assuming the friend ID is passed in the request body
+
+    try {
+      const friend1 = await this.friendRepository.findOne({
+        where: { user: { id: userId }, friend: { id: friendId } },
+      });
+
+      const friend2 = await this.friendRepository.findOne({
+        where: { user: { id: friendId }, friend: { id: userId } },
+      });
+
+      if (!friend1 || !friend2) {
+        return new HttpException(
+          'Friend not found or you do not have permission to unfriend it.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.friendRepository.remove(friend1);
+      await this.friendRepository.remove(friend2);
+
+      return {
+        message: 'Unfriended successfully',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new Error('Error unfriending user: ' + error.message);
+    }
   }
 }

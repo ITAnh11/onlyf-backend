@@ -61,4 +61,10 @@ export class FriendController {
   async searchUser(@Query('username') username: string) {
     return await this.friendService.searchUser(username);
   }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete('unfriend')
+  async unfriend(@Request() req, @Query() query: any) {
+    return this.friendService.unfriend(req, query);
+  }
 }

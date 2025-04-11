@@ -295,6 +295,18 @@ export class FriendService {
         );
       }
 
+      const friendRequest = await this.friendRequestRepository
+        .createQueryBuilder('friendRequest')
+        .where(
+          '(friendRequest.sender.id = :userId AND friendRequest.receiver.id = :friendId) OR (friendRequest.sender.id = :friendId AND friendRequest.receiver.id = :userId)',
+          { userId, friendId },
+        )
+        .getOne();
+      if (friendRequest) {
+        await this.friendRequestRepository.remove(friendRequest);
+      }
+
+      // Remove the friend relationship
       await this.friendRepository.remove(friend1);
       await this.friendRepository.remove(friend2);
 

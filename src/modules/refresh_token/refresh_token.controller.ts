@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Post,
   Query,
@@ -23,7 +24,7 @@ export class RefreshTokenController {
   }
 
   @UseGuards(JwtAccessAuthGuard)
-  @Post('delete-device')
+  @Delete('delete-device')
   async deleteDevice(@Request() req, @Query() query: any) {
     return this.refreshTokenService.deleteDevice(req, query);
   }

@@ -183,7 +183,7 @@ export class RefreshTokenService {
     });
 
     if (!refreshTokenEntity) {
-      throw new HttpException('Not found refresh token', HttpStatus.NOT_FOUND);
+      return new HttpException('Device not found', HttpStatus.NOT_FOUND);
     }
 
     await this.refreshTokenRepository.delete(refreshTokenEntity.id);
@@ -194,6 +194,12 @@ export class RefreshTokenService {
     const userId = req.user.userId;
     const refreshTokens = await this.refreshTokenRepository.find({
       where: { user: { id: userId } },
+      select: {
+        id: true,
+        createdAt: true,
+        deviceName: true,
+        userAgent: true,
+      },
     });
 
     return refreshTokens;

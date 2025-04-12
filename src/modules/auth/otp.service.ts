@@ -119,7 +119,7 @@ export class OTPService {
     }
 
     if (storedOTP === OTPCode) {
-      //   await this.redisClient.del(`OTP_${email}`);
+      await this.redisClient.del(`OTP_${email}`);
 
       const accessToken = await this.createAccessTokenForForgotPassword(user);
 

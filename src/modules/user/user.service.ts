@@ -46,6 +46,12 @@ export class UserService {
 
     return {
       success: true,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        isActivated: newUser.isActivated,
+        createdAt: newUser.createdAt,
+      },
       message: 'User created successfully',
       statusCode: HttpStatus.CREATED,
     };
@@ -60,8 +66,9 @@ export class UserService {
     return null;
   }
 
-  async changePassword(req: any, passwordData: any) {
-    const user = await this.userRepository.findOneBy({ id: req.id });
+  async resetPassword(req: any, passwordData: any) {
+    const { id } = req.user.userId;
+    const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new HttpException(
@@ -74,18 +81,44 @@ export class UserService {
       );
     }
 
+    console.log(user);
     const hashedPassword = await bcrypt.hashSync(
       passwordData.password,
       parseInt(process.env.SALT_ROUNDS || '10'),
     );
 
-    user.password = hashedPassword;
+    await this.userRepository.update(user.id, {
+      password: hashedPassword,
+    });
+
+    return {
+      success: true,
+      message: 'Password reset successfully',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async activateUser(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    user.isActivated = true;
 
     await this.userRepository.update(user.id, user);
 
     return {
       success: true,
-      message: 'Password changed successfully',
+      message: 'User activated successfully',
       statusCode: HttpStatus.OK,
     };
   }

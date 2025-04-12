@@ -1,12 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { RefreshTokenService } from '../refresh_token/refresh_token.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly mailerService: MailerService,
+
+    @Inject('REDIS_CLIENT')
+    private readonly redisClient: Redis,
   ) {}
 
   async register(user: any) {

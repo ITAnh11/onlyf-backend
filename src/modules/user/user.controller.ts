@@ -18,8 +18,8 @@ export class UserController {
 
   @UseGuards(ConfirmPasswordGuard)
   @UseGuards(JwtAccessAuthGuard)
-  @Post('change-password')
-  async changePassword(@Req() req, @Body() data: PasswordDto) {
-    return await this.userService.changePassword(req.user, data);
+  @Post('reset-password')
+  async resetPassword(@Req() req, @Body() data: PasswordDto) {
+    return await this.userService.resetPassword(req, data);
   }
 }

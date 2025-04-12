@@ -16,6 +16,10 @@ import { Post } from './entities/post.entity';
 import { FriendModule } from './modules/friend/friend.module';
 import { Friend } from './entities/friend.entity';
 import { FriendRequest } from './entities/friend-request.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
   imports: [
@@ -36,6 +40,30 @@ import { FriendRequest } from './entities/friend-request.entity';
       entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: parseInt(process.env.MAIL_PORT || ''),
+        secure: process.env.MAIL_SECURE === 'true',
+        // ignoreTLS: true,
+        // secure: true,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      },
+      defaults: {
+        from: '"No Reply" <no-reply@localhost>',
+      },
+      // preview: true,
+      template: {
+        dir: join(__dirname, 'mail/templates'),
+        adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+        options: {
+          strict: true,
+        },
+      },
+    }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
@@ -43,6 +71,7 @@ import { FriendRequest } from './entities/friend-request.entity';
     RefreshTokenModule,
     PostModule,
     FriendModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

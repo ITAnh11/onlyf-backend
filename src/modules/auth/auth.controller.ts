@@ -14,10 +14,14 @@ import { LocalAuthGuard } from 'src/guards/local-auth.guard';
 import { JwtRefreshAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ConfirmPasswordGuard } from 'src/guards/confirm-password.guard';
 import { CheckUniqueUsernameGuard } from 'src/guards/check-unique-username.guard';
+import { OTPService } from './otp.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly otpService: OTPService,
+  ) {}
 
   @UseGuards(ConfirmPasswordGuard)
   @UseGuards(CheckUniqueUsernameGuard)
@@ -43,5 +47,25 @@ export class AuthController {
   @Get('is-logged-in')
   async isLoggedIn(@Request() req) {
     return this.authService.isLoggedIn(req);
+  }
+
+  @Get('get-otp-mail-for-register')
+  async getOTPMailForRegister(@Request() req) {
+    return this.otpService.getOTPMailForRegister(req);
+  }
+
+  @Post('verify-otp-mail-for-register')
+  async verifyOTPMailForRegister(@Request() req) {
+    return this.otpService.verifyOTPMailForRegister(req);
+  }
+
+  @Get('get-otp-mail-for-forgot-password')
+  async getOTPMailForForgotPassword(@Request() req) {
+    return this.otpService.getOTPMailForForgotPassword(req);
+  }
+
+  @Post('verify-otp-mail-for-forgot-password')
+  async verifyOTPMailForForgotPassword(@Request() req) {
+    return this.otpService.verifyOTPMailForForgotPassword(req);
   }
 }

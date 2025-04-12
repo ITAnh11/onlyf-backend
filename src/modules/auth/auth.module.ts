@@ -12,23 +12,29 @@ import {
   JwtRefreshStrategy,
 } from 'src/passports/jwt.strategy';
 import { RefreshTokenModule } from '../refresh_token/refresh_token.module';
+import { RedisModule } from '../redis/redis.module';
+import { OTPService } from './otp.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     UserModule,
     UserprofileModule,
     RefreshTokenModule,
     PassportModule,
     JwtModule,
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
+    OTPService,
     LocalStrategy,
     JwtAccessStrategy,
     JwtRefreshStrategy,
   ],
-  exports: [AuthService],
+  exports: [AuthService, OTPService],
 })
 export class AuthModule {}

@@ -67,8 +67,11 @@ export class UserService {
   }
 
   async resetPassword(req: any, passwordData: any) {
-    const { id } = req.user.userId;
-    const user = await this.userRepository.findOneBy({ id });
+    console.log(req.user);
+    const userId = req.user.userId;
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
 
     if (!user) {
       throw new HttpException(

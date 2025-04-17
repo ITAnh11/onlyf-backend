@@ -19,8 +19,8 @@ export class OTPService {
     return Math.floor(100000 + Math.random() * 900000);
   }
 
-  async getOTPMailForRegister(req: any) {
-    const { email } = req.body;
+  async getOTPMailForRegister(req: any, query: any) {
+    const email = query.email;
     const OTPCode = this.randomOTP();
     const user = await this.userService.findByEmail(email);
     if (!user) {
@@ -66,8 +66,8 @@ export class OTPService {
     }
   }
 
-  async getOTPMailForForgotPassword(req: any) {
-    const { email } = req.body;
+  async getOTPMailForForgotPassword(req: any, query: any) {
+    const email = query.email;
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new HttpException(

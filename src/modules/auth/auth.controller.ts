@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -50,8 +51,8 @@ export class AuthController {
   }
 
   @Get('get-otp-mail-for-register')
-  async getOTPMailForRegister(@Request() req) {
-    return this.otpService.getOTPMailForRegister(req);
+  async getOTPMailForRegister(@Request() req, @Query() query) {
+    return this.otpService.getOTPMailForRegister(req, query);
   }
 
   @Post('verify-otp-mail-for-register')
@@ -60,8 +61,8 @@ export class AuthController {
   }
 
   @Get('get-otp-mail-for-forgot-password')
-  async getOTPMailForForgotPassword(@Request() req) {
-    return this.otpService.getOTPMailForForgotPassword(req);
+  async getOTPMailForForgotPassword(@Request() req, @Query() query) {
+    return this.otpService.getOTPMailForForgotPassword(req, query);
   }
 
   @Post('verify-otp-mail-for-forgot-password')

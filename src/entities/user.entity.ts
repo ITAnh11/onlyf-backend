@@ -75,8 +75,8 @@ export class User {
   friendOf: Friend[];
 
   @OneToMany(() => Notification, (notification) => notification.user)
-  notifications: any[];
+  notifications: Notification[];
 
   @OneToMany(() => FCMToken , (fcmToken) => fcmToken.user)
-  fcmTokens: any[]; // Chưa có entity FCMToken
+  fcmTokens: FCMToken[]; // Chưa có entity FCMToken
 }

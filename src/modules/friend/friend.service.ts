@@ -8,6 +8,7 @@ import { Friend } from 'src/entities/friend.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserprofileService } from '../userprofile/userprofile.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class FriendService {
@@ -22,6 +23,8 @@ export class FriendService {
     private readonly userRepository: Repository<User>,
 
     private readonly userProfileService: UserprofileService,
+
+    private readonly notificationService: NotificationService,
   ) {}
 
   async sendFriendRequest(req: any, query: any): Promise<FriendRequest> {
@@ -57,9 +60,11 @@ export class FriendService {
     const receiver = await this.userRepository.findOne({
       where: { id: receiverId },
     });
+
     if (!receiver) {
       throw new HttpException('Receiver not found.', HttpStatus.NOT_FOUND);
     }
+
     if (receiverId === userId) {
       throw new HttpException(
         'You cannot send a friend request to yourself.',
@@ -72,7 +77,21 @@ export class FriendService {
       receiver: { id: receiverId },
     });
     try {
-      return await this.friendRequestRepository.save(newFriendRequest);
+
+      const senderProfile = await this.userProfileService.getProfile({userId});
+
+      const savedRequest = await this.friendRequestRepository.save(
+        newFriendRequest,
+      );
+
+      this.notificationService.notifyUserFCM(
+        receiverId,
+        'Friend Request',
+        `${senderProfile?.name} has sent you a friend request.`,
+      );
+
+      return savedRequest;
+
     } catch (error) {
       throw new Error('Error sending friend request: ' + error.message);
     }

@@ -28,4 +28,28 @@ export class FirebaseService {
       throw new Error('Error deleting file from Firebase Storage');
     }
   }
+
+  async sendFCM(
+    deviceToken: string,
+    title: string,
+    body: string,
+    data?: Record<string, any>,
+  ): Promise<void> {
+    try {
+      const message = {
+        token: deviceToken,
+        notification: {
+          title,
+          body,
+        },
+        data: data || {},
+      };
+
+      await admin.messaging().send(message);
+    } catch (error) {
+      console.error('Error sending FCM:', error);
+      throw new Error('Error sending FCM');
+    }
+  }
+
 }

@@ -7,12 +7,13 @@ import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from 'src/entities/notification.entity';
 import { FCMToken } from 'src/entities/fcm-token.entity';
+import { User } from 'src/entities/user.entity';
 
 @Module({
   imports: [FirebaseModule, BullModule.registerQueue({
     name: 'notification',
   }),
-  TypeOrmModule.forFeature([Notification, FCMToken]), // Add your entities here
+  TypeOrmModule.forFeature([Notification, FCMToken, User]), // Add your entities here
 ],
   controllers: [NotificationController],
   providers: [NotificationService, NotificationProcessor],

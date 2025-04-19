@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { FCMToken } from 'src/entities/fcm-token.entity';
+import { Notification } from 'src/entities/notification.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -12,9 +14,15 @@ export class NotificationService {
 
         @InjectRepository(FCMToken)
         private readonly fcmTokenRepository: Repository<FCMToken>,
+
+        @InjectRepository(Notification)
+        private readonly notificationRepository: Repository<Notification>,
+
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
       ) {}
     
-      async notifyUserFCM(userId: number, title: string, body: string, data = {}) {
+      async notifyUserFCM(userId: number, title: string, body: string, data = {}, senderId?: number) {
         const deviceTokens = await this.fcmTokenRepository.find({
           where: {
             user: { id: userId },
@@ -24,17 +32,40 @@ export class NotificationService {
           console.log('No device tokens found for user:', userId);
           return;
         }
+        
         for (const token of deviceTokens) {
           const deviceToken = token.token;
-          this.notificationQueue.add('sendNotification', {
+          this.notificationQueue.add('send-fcm', {
             deviceToken,
             title,
             body,
             data,
           }, {
             attempts: 3, // Retry 3 times if the job fails
-            backoff: 60000, // Wait 60 seconds before retrying
+            backoff: 30000, // Wait 30 seconds before retrying
           });
+        }
+
+        // Save notification to database
+        await this.saveNotification(userId, title, body, data, senderId);
+     }
+
+     async saveNotification(userId: number, title: string, body: string, data = {}, senderId?: number) {
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        if (!user) {
+          console.log('User not found:', userId);
+          return;
+        }
+        
+        const notification = this.notificationRepository.create({
+          user,
+          title,
+          body,
+          data,
+          sender: senderId,
+        });
+
+        await this.notificationRepository.save(notification);
+
       }
-    }
 }

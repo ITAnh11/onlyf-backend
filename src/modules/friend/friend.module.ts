@@ -6,11 +6,13 @@ import { Friend } from 'src/entities/friend.entity';
 import { FriendRequest } from 'src/entities/friend-request.entity';
 import { User } from 'src/entities/user.entity';
 import { UserprofileModule } from '../userprofile/userprofile.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Friend, FriendRequest, User]),
     UserprofileModule,
+    NotificationModule,
   ],
   controllers: [FriendController],
   providers: [FriendService],

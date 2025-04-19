@@ -4,6 +4,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   Column,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -13,10 +14,11 @@ export class Notification {
   id: number;
 
   @ManyToOne(() => User, (user) => user.notifications) // Người nhận thông báo
+  @JoinColumn()
   user: User;
 
-  @ManyToOne(() => User, { nullable: true }) // Người gây ra hành động (like, kb, nhắn tin)
-  sender: User;
+  @Column({ nullable: true })
+  sender: number; // nguoi gay ra thông báo
 
   @Column()
   title: string;
@@ -26,12 +28,6 @@ export class Notification {
 
   @Column({ type: 'json', nullable: true }) // chứa id bài viết, tin nhắn, ...
   data: any;
-
-  @Column({ default: 'pending' }) // 'sent', 'failed'
-  status: string;
-
-  @Column({ nullable: true })
-  errorMessage: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -20,6 +20,11 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { RedisModule } from './modules/redis/redis.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { BullModule } from '@nestjs/bull';
+import { Notification } from './entities/notification.entity';
+import { FCMToken } from './entities/fcm-token.entity';
+import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
 
 @Module({
   imports: [
@@ -37,7 +42,7 @@ import { RedisModule } from './modules/redis/redis.module';
               rejectUnauthorized: false,
             }
           : false,
-      entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest],
+      entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest, Notification, FCMToken],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
     MailerModule.forRoot({
@@ -64,6 +69,16 @@ import { RedisModule } from './modules/redis/redis.module';
         },
       },
     }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT || ''),
+        password: process.env.REDIS_PASSWORD,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'notification',
+    }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
@@ -72,6 +87,8 @@ import { RedisModule } from './modules/redis/redis.module';
     PostModule,
     FriendModule,
     RedisModule,
+    NotificationModule,
+    FcmTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

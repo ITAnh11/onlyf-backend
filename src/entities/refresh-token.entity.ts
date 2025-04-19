@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { FCMToken } from './fcm-token.entity';
 
 @Entity()
 export class RefreshToken {
@@ -40,4 +41,9 @@ export class RefreshToken {
   @ManyToOne(() => User, (user) => user.refreshTokens)
   @JoinColumn()
   user: User;
+
+  @OneToOne(() => FCMToken, (fcmToken) => fcmToken.refreshToken, {
+    cascade: true,
+  })
+  fcmToken: string;
 }

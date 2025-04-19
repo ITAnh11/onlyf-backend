@@ -1,9 +1,6 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { FirebaseService } from '../firebase/firebase.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Notification } from 'src/entities/notification.entity';
-import { Repository } from 'typeorm';
 
 @Processor('notification')
 export class NotificationProcessor {

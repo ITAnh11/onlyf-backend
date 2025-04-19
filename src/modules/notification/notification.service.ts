@@ -6,12 +6,11 @@ import { FCMToken } from 'src/entities/fcm-token.entity';
 import { Notification } from 'src/entities/notification.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class NotificationService {
     constructor(
-        @InjectQueue('notification') private notificationQueue: Queue,
-
         @InjectRepository(FCMToken)
         private readonly fcmTokenRepository: Repository<FCMToken>,
 
@@ -20,9 +19,13 @@ export class NotificationService {
 
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-      ) {}
+
+        private readonly firebaseService: FirebaseService,
+      ) {
+      }
     
       async notifyUserFCM(userId: number, title: string, body: string, data = {}, senderId?: number) {
+
         const deviceTokens = await this.fcmTokenRepository.find({
           where: {
             user: { id: userId },
@@ -32,18 +35,19 @@ export class NotificationService {
           console.log('No device tokens found for user:', userId);
           return;
         }
-        
+
         for (const token of deviceTokens) {
-          const deviceToken = token.token;
-          this.notificationQueue.add('send-fcm', {
-            deviceToken,
-            title,
-            body,
-            data,
-          }, {
-            attempts: 3, // Retry 3 times if the job fails
-            backoff: 30000, // Wait 30 seconds before retrying
-          });
+          try {
+            this.firebaseService.sendFCM(
+              token.token,
+              title,
+              body,
+              data,
+            );
+          }
+          catch (error) {
+            console.error('Error adding job to queue:', error);
+          }
         }
 
         // Save notification to database

@@ -78,7 +78,7 @@ export class FriendService {
     });
     try {
 
-      const senderProfile = await this.userProfileService.getProfile({userId});
+      const senderProfile = await this.userProfileService.getProfile({user: {userId}});
 
       const savedRequest = await this.friendRequestRepository.save(
         newFriendRequest,

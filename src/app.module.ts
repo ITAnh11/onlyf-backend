@@ -21,7 +21,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { RedisModule } from './modules/redis/redis.module';
 import { NotificationModule } from './modules/notification/notification.module';
-import { BullModule } from '@nestjs/bull';
 import { Notification } from './entities/notification.entity';
 import { FCMToken } from './entities/fcm-token.entity';
 import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
@@ -68,17 +67,9 @@ import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
           strict: true,
         },
       },
+   
     }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT || ''),
-        password: process.env.REDIS_PASSWORD,
-      },
-    }),
-    BullModule.registerQueue({
-      name: 'notification',
-    }),
+    RedisModule,
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
@@ -86,7 +77,6 @@ import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
     RefreshTokenModule,
     PostModule,
     FriendModule,
-    RedisModule,
     NotificationModule,
     FcmTokenModule,
   ],

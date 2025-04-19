@@ -2,16 +2,19 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from 'src/entities/refresh-token.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { FcmTokenService } from '../fcm_token/fcm_token.service';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly fcmTokenService: FcmTokenService,
 
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
+
   ) {}
 
   createNewToken(user: any) {
@@ -160,15 +163,20 @@ export class RefreshTokenService {
   }
 
   async deleteRefreshToken(user: any) {
-    const { user_id, createdAt } = user;
+    const { userId, createdAt } = user;
 
     const refreshTokenEntity = await this.refreshTokenRepository.findOne({
-      where: { user: { id: user_id }, createdAt: new Date(createdAt) },
+      where: { user: { id: userId }, createdAt: new Date(createdAt) },
     });
 
     if (!refreshTokenEntity) {
       throw new HttpException('Not found refresh token', HttpStatus.NOT_FOUND);
     }
+
+    await this.fcmTokenService.deleteToken(
+      userId,
+      refreshTokenEntity.id,
+    );
 
     await this.refreshTokenRepository.delete(refreshTokenEntity.id);
     return new HttpException('Logout success', HttpStatus.OK);

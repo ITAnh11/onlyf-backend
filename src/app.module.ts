@@ -24,6 +24,10 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { Notification } from './entities/notification.entity';
 import { FCMToken } from './entities/fcm-token.entity';
 import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
+import { Message } from './entities/message.entity';
+import { ChatGateway } from './modules/chat/chat.gateway';
+import { ChatModule } from './modules/chat/chat.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -41,7 +45,7 @@ import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
               rejectUnauthorized: false,
             }
           : false,
-      entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest, Notification, FCMToken],
+      entities: [User, UserProfile, RefreshToken, Post, Friend, FriendRequest, Notification, FCMToken, Message],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     }),
     MailerModule.forRoot({
@@ -69,6 +73,7 @@ import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
       },
    
     }),
+    JwtModule,
     RedisModule,
     ScheduleModule.forRoot(),
     AuthModule,
@@ -79,8 +84,9 @@ import { FcmTokenModule } from './modules/fcm_token/fcm_token.module';
     FriendModule,
     NotificationModule,
     FcmTokenModule,
+    ChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway],
 })
 export class AppModule {}

@@ -5,10 +5,12 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Message } from './message.entity';
 
 @Entity()
 export class Post {
@@ -40,4 +42,9 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
+
+  @OneToMany(() => Message, (message) => message.replyToPost, {
+    onDelete: 'CASCADE',
+  })
+  replys: Message[];
 }

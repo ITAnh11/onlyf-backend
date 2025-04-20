@@ -8,11 +8,13 @@ import { Notification } from 'src/entities/notification.entity';
 import { FCMToken } from 'src/entities/fcm-token.entity';
 import { User } from 'src/entities/user.entity';
 import { RedisModule } from '../redis/redis.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     FirebaseModule, 
-    TypeOrmModule.forFeature([Notification, FCMToken, User]),
+    TypeOrmModule.forFeature([Notification, FCMToken]),
+    UserModule,
     FirebaseModule,
    // Add your entities here
 ],

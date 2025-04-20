@@ -15,6 +15,7 @@ import { Friend } from './friend.entity';
 import { FriendRequest } from './friend-request.entity';
 import { Notification } from './notification.entity';
 import { FCMToken } from './fcm-token.entity';
+import { Message } from './message.entity';
 
 @Entity()
 export class User {
@@ -79,4 +80,10 @@ export class User {
 
   @OneToMany(() => FCMToken , (fcmToken) => fcmToken.user)
   fcmTokens: FCMToken[]; // Chưa có entity FCMToken
+
+  @OneToMany(() => Message, (message) => message.sender)
+  sentMessages: Message[];
+
+  @OneToMany(() => Message, (message) => message.receiver)
+  receivedMessages: Message[];
 }

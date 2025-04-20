@@ -6,7 +6,6 @@ import { UserprofileModule } from '../userprofile/userprofile.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from 'src/passports/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
 import {
   JwtAccessStrategy,
   JwtRefreshStrategy,
@@ -17,9 +16,6 @@ import { OTPService } from './otp.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     UserModule,
     UserprofileModule,
     RefreshTokenModule,

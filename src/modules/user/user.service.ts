@@ -84,7 +84,6 @@ export class UserService {
       );
     }
 
-    console.log(user);
     const hashedPassword = await bcrypt.hashSync(
       passwordData.password,
       parseInt(process.env.SALT_ROUNDS || '10'),

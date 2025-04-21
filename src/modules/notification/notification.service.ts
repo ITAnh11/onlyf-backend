@@ -28,7 +28,7 @@ export class NotificationService {
 
         const deviceTokens = await this.fcmTokenRepository.find({
           where: {
-            user: { id: userId },
+            userId,
           },
         });
         if (deviceTokens.length === 0) {
@@ -55,7 +55,7 @@ export class NotificationService {
      }
 
      async saveNotification(userId: number, title: string, body: string, data = {}, senderId?: number) {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
+        const user = await this.userRepository.findOne({ where: {id: userId} });
         if (!user) {
           console.log('User not found:', userId);
           return;

@@ -4,6 +4,7 @@ import {
   Entity,
   Index,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -11,11 +12,15 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Message } from './message.entity';
+import { React } from './react.entity';
 
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  userId: number;
 
   @Column({
     nullable: true,
@@ -40,11 +45,16 @@ export class Post {
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => Message, (message) => message.replyToPost, {
+  @OneToMany(() => Message, (message) => message.post, {
     onDelete: 'CASCADE',
   })
   replys: Message[];
+
+  @ManyToMany(() => React, (react) => react.post, {
+    onDelete: 'CASCADE',
+  })
+  reacts: React[];
 }

@@ -16,13 +16,13 @@ export class FCMToken {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.fcmTokens) // Người nhận thông báo
-  @JoinColumn()
-  user: User;
+  @Column()
+  userId: number;
 
-  @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.fcmToken)
-  @JoinColumn()
-  refreshToken: RefreshToken;
+  @Column({
+    unique: true,
+  })
+  refreshTokenId: number;
 
   @Column()
   token: string;
@@ -32,4 +32,12 @@ export class FCMToken {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.fcmTokens) // Người nhận thông báo
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.fcmToken)
+  @JoinColumn({ name: 'refreshTokenId' })
+  refreshToken: RefreshToken;
 }

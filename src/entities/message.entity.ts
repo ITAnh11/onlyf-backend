@@ -21,14 +21,9 @@ import { Post } from './post.entity';
     @Column()
     receiverId: number;
 
-    @ManyToOne(() => User, (user) => user.sentMessages)
-    @JoinColumn({ name: 'senderId' })
-    sender: User;
+    @Column({ nullable: true })
+    postId?: number; // ID bài viết nếu tin nhắn là một bài viết
 
-    @ManyToOne(() => User, (user) => user.receivedMessages)
-    @JoinColumn({ name: 'receiverId' })
-    receiver: User;
-  
     @Column({ nullable: true })
     text?: string; // Nội dung tin nhắn văn bản
   
@@ -36,8 +31,8 @@ import { Post } from './post.entity';
     mediaUrl?: string; // URL file ảnh, video, audio...
 
     @ManyToOne(() => Post, (post) => post.replys)
-    @JoinColumn()
-    replyToPost?: Post; // Tin nhắn trả lời cho một bài viết
+    @JoinColumn({ name: 'postId' })
+    post?: Post; // Bài viết nếu tin nhắn là một bài viết
   
     @Column({
       type: 'enum',
@@ -58,4 +53,12 @@ import { Post } from './post.entity';
   
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @ManyToOne(() => User, (user) => user.sentMessages)
+    @JoinColumn({ name: 'senderId' })
+    sender: User;
+
+    @ManyToOne(() => User, (user) => user.receivedMessages)
+    @JoinColumn({ name: 'receiverId' })
+    receiver: User;
   }

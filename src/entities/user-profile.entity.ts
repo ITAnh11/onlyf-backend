@@ -13,6 +13,8 @@ export class UserProfile {
   id: number;
 
   @Column()
+  userId: number;
+  @Column()
   name: string;
 
   @Column({ unique: true })
@@ -40,6 +42,6 @@ export class UserProfile {
   pathAvatar: string;
 
   @OneToOne(() => User, (user) => user.profile)
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

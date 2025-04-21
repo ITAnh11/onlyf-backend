@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -20,11 +21,11 @@ export class FriendRequest {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.sentRequests)
-  sender: User;
+  @Column()
+  senderId: number;
 
-  @ManyToOne(() => User, (user) => user.receivedRequests)
-  receiver: User;
+  @Column()
+  receiverId: number;
 
   @Column({
     type: 'enum',
@@ -35,4 +36,12 @@ export class FriendRequest {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.sentRequests)
+  @JoinColumn({ name: 'senderId' })
+  sender: User;
+
+  @ManyToOne(() => User, (user) => user.receivedRequests)
+  @JoinColumn({ name: 'receiverId' })
+  receiver: User;
 }

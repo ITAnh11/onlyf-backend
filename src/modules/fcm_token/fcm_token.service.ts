@@ -22,19 +22,21 @@ export class FcmTokenService {
 
         const refreshTokenEntity = await this.refreshTokenRepository.findOne({
             where: {
-                user: { id: userId },
+                userId,
                 createdAt
             },
         });
-
+        
         if (!refreshTokenEntity) {
             throw new Error('Refresh token not found');
         }
 
+        const refreshTokenId = refreshTokenEntity?.id;
+
         const existingToken = await this.fcmTokenRepository.findOne({
             where: {
-                user: { id: userId },
-                refreshToken: { id: refreshTokenEntity.id },
+                userId,
+                refreshTokenId,
             },
         });
   
@@ -48,9 +50,9 @@ export class FcmTokenService {
         } else {
             // Nếu token chưa tồn tại, tạo mới
             const newToken = this.fcmTokenRepository.create({
-                user: { id: userId },
+                userId,
                 token,
-                refreshToken: refreshTokenEntity,
+                refreshTokenId,
             });
             await this.fcmTokenRepository.save(newToken);
 
@@ -61,8 +63,8 @@ export class FcmTokenService {
     async deleteToken(userId: number, refreshTokenId: number){
         const existingToken = await this.fcmTokenRepository.findOne({
             where: {
-                user: { id: userId },
-                refreshToken: { id: refreshTokenId },
+                userId,
+                refreshTokenId,
             },
         });
 

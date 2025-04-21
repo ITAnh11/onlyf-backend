@@ -5,6 +5,7 @@ import {
   Unique,
   CreateDateColumn,
   Column,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -14,11 +15,11 @@ export class Friend {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.friends)
-  user: User;
+  @Column()
+  userId: number;
 
-  @ManyToOne(() => User, (user) => user.friendOf)
-  friend: User;
+  @Column()
+  friendId: number;
 
   @Column({
     default: false,
@@ -27,4 +28,13 @@ export class Friend {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.friends)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => User, (user) => user.friendOf)
+  @JoinColumn({ name: 'friendId' })
+  friend: User;
+
 }

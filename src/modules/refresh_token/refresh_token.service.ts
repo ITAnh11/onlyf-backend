@@ -77,7 +77,7 @@ export class RefreshTokenService {
       : 'Unknown Device';
 
     const newRefreshToken = this.refreshTokenRepository.create({
-      user: { id: userId },
+      userId,
       refreshToken: bcrypt.hashSync(
         refreshToken,
         parseInt(process.env.SALT_ROUNDS || '10'),
@@ -89,7 +89,7 @@ export class RefreshTokenService {
           ),
       ),
       createdAt,
-      deviceName: deviceInfo.brand + ' ' + deviceInfo.model,
+      deviceName,
       userAgent,
     });
 
@@ -129,7 +129,7 @@ export class RefreshTokenService {
 
     const refreshTokenEntity = await this.refreshTokenRepository.findOne({
       where: {
-        user: { id: userId },
+        userId,
         createdAt: new Date(createdAt),
       },
     });
@@ -166,7 +166,7 @@ export class RefreshTokenService {
     const { userId, createdAt } = user;
 
     const refreshTokenEntity = await this.refreshTokenRepository.findOne({
-      where: { user: { id: userId }, createdAt: new Date(createdAt) },
+      where: { userId, createdAt: new Date(createdAt) },
     });
 
     if (!refreshTokenEntity) {
@@ -187,7 +187,7 @@ export class RefreshTokenService {
     const userId = req.user.userId;
     const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({
       id,
-      user: { id: userId },
+      userId,
     });
 
     if (!refreshTokenEntity) {
@@ -201,7 +201,7 @@ export class RefreshTokenService {
   async getAllDevice(req: any) {
     const userId = req.user.userId;
     const refreshTokens = await this.refreshTokenRepository.find({
-      where: { user: { id: userId } },
+      where: { userId },
       select: {
         id: true,
         createdAt: true,
@@ -216,7 +216,7 @@ export class RefreshTokenService {
   async validateRefreshToken(payload: any, refreshToken: string) {
     const { userId, createdAt } = payload;
     const refreshTokenEntity = await this.refreshTokenRepository.findOne({
-      where: { user: { id: userId }, createdAt: new Date(createdAt) },
+      where: { userId, createdAt: new Date(createdAt) },
     });
 
     if (!refreshTokenEntity) {

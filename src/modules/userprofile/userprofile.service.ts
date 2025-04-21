@@ -30,8 +30,9 @@ export class UserprofileService {
 
   async getProfile(req: any) {
     const user = req.user;
+    const userId = user.userId;
     const profile = await this.userProfileRepository.findOne({
-      where: { user: { id: user.userId } },
+      where: { userId },
       relations: ['user'],
       select: {
         id: true,
@@ -50,8 +51,9 @@ export class UserprofileService {
 
   async updateProfile(req: any, data: any) {
     const user = req.user;
+    const userId = user.userId;
     const profile = await this.userProfileRepository.findOne({
-      where: { user: { id: user.userId } },
+      where: { userId },
     });
 
     if (!profile) {
@@ -62,7 +64,7 @@ export class UserprofileService {
 
     return {
       userProfile: await this.userProfileRepository.findOne({
-        where: { user: { id: user.userId } },
+        where: { userId },
       }),
       success: true,
       message: 'Profile updated successfully',
@@ -72,8 +74,9 @@ export class UserprofileService {
 
   async updateAvatar(req: any, data: any) {
     const user = req.user;
+    const userId = user.userId;
     const profile = await this.userProfileRepository.findOne({
-      where: { user: { id: user.userId } },
+      where: { userId },
     });
 
     if (!profile) {
@@ -91,8 +94,9 @@ export class UserprofileService {
 
   async deleteAvatar(req: any) {
     const user = req.user;
+    const userId = user.userId;
     const profile = await this.userProfileRepository.findOne({
-      where: { user: { id: user.userId } },
+      where: { userId },
     });
 
     if (!profile) {

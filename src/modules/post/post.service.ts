@@ -2,12 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/entities/post.entity';
 import { Repository } from 'typeorm';
+import { ReactService } from '../react/react.service';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+
+    private readonly reactService: ReactService, // Inject ReactService
   ) {}
 
   async createPost(req: any, data: any): Promise<Post> {
@@ -16,7 +19,7 @@ export class PostService {
       caption: data.caption,
       urlPublicImage: data.urlPublicImage,
       pathImage: data.pathImage,
-      user: { id: userId }, // Assuming req.user contains the user object
+      userId, // Assuming req.user contains the user object
     });
     try {
       return await this.postRepository.save(newPost);
@@ -63,8 +66,28 @@ export class PostService {
     const paginatedPosts = hasMore ? posts.slice(0, limit) : posts;
     const nextCursor = hasMore ? paginatedPosts[limit - 1].createdAt : null;
 
+    const serialzedPosts = paginatedPosts.map((post) => ({
+      id: post.id,
+      caption: post.caption,
+      createdAt: post.createdAt,
+      urlPublicImage: post.urlPublicImage,
+      user: {
+        id: post.user.id,
+        profile: {
+          name: post.user.profile.name,
+          urlPublicAvatar: post.user.profile.urlPublicAvatar,
+        } 
+      },
+      reacts: {},
+    }));
+    
+    for (const post of serialzedPosts) {
+      const reacts = await this.reactService.getReactsByPostId(post.id);
+      post.reacts = reacts;
+    }
+
     return {
-      posts: paginatedPosts,
+      posts: serialzedPosts,
       hasMore,
       nextCursor,
     };
@@ -76,7 +99,7 @@ export class PostService {
     try {
       const result = await this.postRepository.delete({
         id: postId,
-        user: { id: userId }, // Sử dụng điều kiện đơn giản
+        userId, // Sử dụng điều kiện đơn giản
       });
 
       if (result.affected === 0) {
@@ -142,10 +165,36 @@ export class PostService {
     const paginatedPosts = hasMore ? posts.slice(0, limit) : posts;
     const nextCursor = hasMore ? paginatedPosts[limit - 1].createdAt : null;
 
+    const serialzedPosts = paginatedPosts.map((post) => ({
+      id: post.id,
+      caption: post.caption,
+      createdAt: post.createdAt,
+      urlPublicImage: post.urlPublicImage,
+      user: {
+        id: post.user.id,
+        profile: {
+          name: post.user.profile.name,
+          urlPublicAvatar: post.user.profile.urlPublicAvatar,
+        } 
+      },
+      reacts: {},
+    }));
+    
+    for (const post of serialzedPosts) {
+      const reacts = await this.reactService.getReactsByPostId(post.id);
+      post.reacts = reacts;
+    }
+
     return {
-      posts: paginatedPosts,
+      posts: serialzedPosts,
       hasMore,
       nextCursor,
     };
+  }
+
+  async getPostById(postId: number) {
+    return await this.postRepository.findOne({
+      where: { id: postId },
+    });
   }
 }

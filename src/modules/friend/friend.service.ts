@@ -33,8 +33,8 @@ export class FriendService {
 
     const existingRequest = await this.friendRequestRepository.findOne({
       where: {
-        sender: { id: userId },
-        receiver: { id: receiverId },
+        senderId: userId,
+        receiverId: receiverId,
       },
     });
 
@@ -73,8 +73,8 @@ export class FriendService {
     }
 
     const newFriendRequest = this.friendRequestRepository.create({
-      sender: { id: userId },
-      receiver: { id: receiverId },
+      senderId: userId,
+      receiverId: receiverId,
     });
     try {
 
@@ -103,7 +103,7 @@ export class FriendService {
 
     try {
       const friendRequest = await this.friendRequestRepository.findOne({
-        where: { id: requestId, receiver: { id: userId } },
+        where: { id: requestId, receiverId: userId },
         relations: ['sender', 'receiver'],
       });
 
@@ -122,12 +122,12 @@ export class FriendService {
       }
 
       const newFriend1 = this.friendRepository.create({
-        user: { id: userId },
-        friend: { id: friendRequest.sender.id },
+        userId: userId,
+        friendId: friendRequest.senderId,
       });
       const newFriend2 = this.friendRepository.create({
-        user: { id: friendRequest.sender.id },
-        friend: { id: userId },
+        userId: friendRequest.senderId,
+        friendId: userId,
       });
 
       await this.friendRepository.save(newFriend1);
@@ -151,7 +151,7 @@ export class FriendService {
 
     try {
       const friendRequest = await this.friendRequestRepository.findOne({
-        where: { id: requestId, receiver: { id: userId } },
+        where: { id: requestId, receiverId: userId },
       });
 
       if (!friendRequest) {
@@ -186,7 +186,7 @@ export class FriendService {
     const requestId = parseInt(query.requestId); // Assuming the request ID is passed in the request body
     try {
       const friendRequest = await this.friendRequestRepository.findOne({
-        where: { id: requestId, sender: { id: userId } },
+        where: { id: requestId, senderId: userId },
       });
 
       if (!friendRequest) {
@@ -300,11 +300,11 @@ export class FriendService {
 
     try {
       const friend1 = await this.friendRepository.findOne({
-        where: { user: { id: userId }, friend: { id: friendId } },
+        where: { userId, friendId },
       });
 
       const friend2 = await this.friendRepository.findOne({
-        where: { user: { id: friendId }, friend: { id: userId } },
+        where: { userId: friendId , friendId: userId  },
       });
 
       if (!friend1 || !friend2) {

@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -14,6 +13,9 @@ import { FCMToken } from './fcm-token.entity';
 export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  userId: number;
 
   @Column()
   refreshToken: string;
@@ -39,11 +41,9 @@ export class RefreshToken {
   userAgent: string;
 
   @ManyToOne(() => User, (user) => user.refreshTokens)
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToOne(() => FCMToken, (fcmToken) => fcmToken.refreshToken, {
-    cascade: true,
-  })
+  @OneToOne(() => FCMToken, (fcmToken) => fcmToken.refreshToken)
   fcmToken: string;
 }

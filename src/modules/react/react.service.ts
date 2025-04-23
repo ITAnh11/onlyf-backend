@@ -4,6 +4,7 @@ import { React } from 'src/entities/react.entity';
 import { Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
 import { Post } from 'src/entities/post.entity';
+import { UserprofileService } from '../userprofile/userprofile.service';
 
 @Injectable()
 export class ReactService {
@@ -15,11 +16,14 @@ export class ReactService {
         private readonly postRepository: Repository<Post>,
 
         private readonly notificationService: NotificationService,
-    ) {}s
+
+        private readonly userProfileService: UserprofileService,
+    ) {}
 
     async createReact(req: any) {
-        const user = req.user;
-        const userId = user.userId;
+        const userId = req.user.userId;
+
+        const userprofile = await this.userProfileService.getProfile({user: {userId}});
 
         const { postId, type } = req.body;
 
@@ -40,10 +44,13 @@ export class ReactService {
         this.notificationService.notifyUserFCM(
             post.userId,
             'New React',
-            `${user.name} reacted to your post`,
+            `${userprofile?.name} reacted to your post`,
             {
-                postId: post.id,
-                type: react.type,
+                senderId: userId.toString(),
+                senderName: userprofile?.name,
+                senderAvatar: userprofile?.urlPublicAvatar,
+                postId: postId.toString(),
+                reactType: type,
             },
             userId,
         );

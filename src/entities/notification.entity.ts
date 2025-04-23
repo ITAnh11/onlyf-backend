@@ -13,12 +13,11 @@ export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.notifications) // Người nhận thông báo
-  @JoinColumn()
-  user: User;
+  @Column()
+  userId: number; // Người nhận thông báo
 
   @Column({ nullable: true })
-  sender: number; // nguoi gay ra thông báo
+  senderId: number; // nguoi gay ra thông báo
 
   @Column()
   title: string;
@@ -31,4 +30,9 @@ export class Notification {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.notifications) // Người nhận thông báo
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }
+

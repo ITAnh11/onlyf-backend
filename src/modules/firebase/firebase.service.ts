@@ -33,18 +33,20 @@ export class FirebaseService {
     deviceToken: string,
     title: string,
     body: string,
-    data?: Record<string, any>,
+    data?: Record<string, any>, // nhận bất kỳ kiểu gì
   ): Promise<void> {
     try {
+      console.log('Raw data:', data);
+
       const message = {
         token: deviceToken,
         notification: {
           title,
           body,
         },
-        data: data || {},
+        data, // Đảm bảo `data` chỉ chứa chuỗi
       };
-
+  
       await admin.messaging().send(message);
     } catch (error) {
       console.error('Error sending FCM:', error);

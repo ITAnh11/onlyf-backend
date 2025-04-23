@@ -29,10 +29,6 @@ import { Post } from './post.entity';
   
     @Column({ nullable: true })
     mediaUrl?: string; // URL file ảnh, video, audio...
-
-    @ManyToOne(() => Post, (post) => post.replys)
-    @JoinColumn({ name: 'postId' })
-    post?: Post; // Bài viết nếu tin nhắn là một bài viết
   
     @Column({
       type: 'enum',
@@ -53,6 +49,10 @@ import { Post } from './post.entity';
   
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @ManyToOne(() => Post, (post) => post.replys)
+    @JoinColumn({ name: 'postId' })
+    post?: Post; // Bài viết nếu tin nhắn là một bài viết
 
     @ManyToOne(() => User, (user) => user.sentMessages)
     @JoinColumn({ name: 'senderId' })

@@ -25,7 +25,6 @@ export class NotificationService {
       }
     
       async notifyUserFCM(userId: number, title: string, body: string, data = {}, senderId?: number) {
-
         const deviceTokens = await this.fcmTokenRepository.find({
           where: {
             userId,
@@ -35,24 +34,23 @@ export class NotificationService {
           console.log('No device tokens found for user:', userId);
           return;
         }
-
+      
         for (const token of deviceTokens) {
           try {
             this.firebaseService.sendFCM(
               token.token,
               title,
               body,
-              data,
+              data, // Truyền `data` trực tiếp, không cần JSON.stringify
             );
-          }
-          catch (error) {
-            console.error('Error adding job to queue:', error);
+          } catch (error) {
+            console.error('Error sending FCM:', error);
           }
         }
-
+      
         // Save notification to database
         await this.saveNotification(userId, title, body, data, senderId);
-     }
+      }
 
      async saveNotification(userId: number, title: string, body: string, data = {}, senderId?: number) {
         const user = await this.userRepository.findOne({ where: {id: userId} });
@@ -66,7 +64,7 @@ export class NotificationService {
           title,
           body,
           data,
-          sender: senderId,
+          senderId,
         });
 
         await this.notificationRepository.save(notification);

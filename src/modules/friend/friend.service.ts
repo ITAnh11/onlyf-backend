@@ -88,6 +88,12 @@ export class FriendService {
         receiverId,
         'Friend Request',
         `${senderProfile?.name} has sent you a friend request.`,
+        {
+          senderId: userId.toString(),
+          senderName: senderProfile?.name,
+          senderAvatar: senderProfile?.urlPublicAvatar,
+        },
+        userId
       );
 
       return savedRequest;

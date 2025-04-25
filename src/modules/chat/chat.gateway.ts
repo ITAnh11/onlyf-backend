@@ -5,7 +5,6 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  WsException,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -14,6 +13,7 @@ import { Inject } from '@nestjs/common';
 import Redis from 'ioredis';
 import { NotificationService } from '../notification/notification.service';
 import { ChatService } from './chat.service';
+import { UserprofileService } from '../userprofile/userprofile.service';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -28,10 +28,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly notificationService: NotificationService,
     private readonly chatService: ChatService,
+
+    private readonly userProfileService: UserprofileService,
   ) {}
   
-  handleConnection(client: Socket) {
-    const token = client.handshake.auth?.token.split(' ')[1]; // Bearer <token>
+  async handleConnection(client: Socket) {
+    const token = client.handshake.auth?.token.split(' ')[1];
     if (!token) {
       client.disconnect();
       return;
@@ -43,6 +45,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       const userId = payload.sub;
       client.data.user = payload;
+
+      const userprofile = await this.userProfileService.getProfile({ user: { userId } });
+
+      client.data.user = {
+        ...payload,
+        urlPublicAvatar: userprofile?.urlPublicAvatar,
+        name: userprofile?.name,
+      }
 
       // Store the socket ID in Redis with userId as the key
       this.redisClient.set(`user:${userId}`, client.id);
@@ -72,6 +82,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const user = client.data.user;
     console.log(`📩 User ${user.sub} sent a message:`, payload);
+
+    this.notificationService.notifyUserFCM(
+      payload.recipientId,
+      `New message from ${user.sub}`,
+      `You have a new message from ${user.sub}`,
+      {
+        senderId: user.sub.toString(),
+        senderName: user.name,
+        senderAvatar: user.urlPublicAvatar,
+        messageText: payload.message.text? payload.message.text : `New message`,
+    },
+      user.sub, 
+    );
+
+    this.chatService.saveMessage({
+      senderId: user.sub,
+      receiverId: payload.recipientId,
+      text: payload.message.text,
+      type: payload.message.type,
+      mediaUrl: payload.mediaUrl,
+      createdAt: payload.message.createdAt,
+    });
 
     const recipientId = payload.recipientId;
     const recipientSocketId = await this.redisClient.get(`user:${recipientId}`);

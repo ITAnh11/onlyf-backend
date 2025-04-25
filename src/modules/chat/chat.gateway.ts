@@ -129,13 +129,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
 
-  @SubscribeMessage('readMessage')
-  async handleReadMessage(
+  @SubscribeMessage('markMessageAsRead') // Đổi tên sự kiện
+  async handleMarkMessageAsRead(
     @MessageBody() payload: any,
     @ConnectedSocket() client: Socket,
   ) {
     const user = client.data.user;
-    console.log(`📖 User ${user.sub} read a message:`, payload);
+    console.log(`📖 User ${user.sub} marked a message as read:`, payload);
 
     this.chatService.updateIsReadMessage(
       user.sub,
@@ -158,8 +158,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    recipientSocket.emit('messageRead', {
-      messageId: payload.messageId,
+    recipientSocket.emit('messageMarkedAsRead', { // Đổi tên sự kiện
       senderId: user.sub,
     });
     console.log(`📖 Read status sent to user ${payload.senderId}`);

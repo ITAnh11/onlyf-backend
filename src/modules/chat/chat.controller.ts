@@ -1,4 +1,4 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtAccessAuthGuard } from 'src/guards/jwt-auth.guard';
 
@@ -12,4 +12,11 @@ export class ChatController {
     return await this.chatService.replyToPost(req);
   }
  
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('get-messages')
+  async getMessages(@Request() req: any, @Query() query: any) {
+    return await this.chatService.getMessages(req, query);
+  }
+
 }

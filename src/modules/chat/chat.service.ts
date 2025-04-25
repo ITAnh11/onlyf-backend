@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from 'src/entities/message.entity';
 import { Repository } from 'typeorm';
@@ -78,5 +78,39 @@ export class ChatService {
         .andWhere('"message"."senderId" = :senderId', { senderId })
         .andWhere('"message"."status" = :status', { status: 'sent' })
         .execute();
+    }
+
+    async getMessages(req: any, query: any) {
+        const { cursor, limit, friendId } = query;
+        const userId = req.user.userId;
+    
+        const parsedLimit = parseInt(limit, 10);
+        if (!parsedLimit || parsedLimit <= 0 || parsedLimit > 50) {
+            throw new HttpException('Invalid limit', HttpStatus.BAD_REQUEST);
+        }
+
+        const qb = this.messageRepository
+            .createQueryBuilder('message')
+            .leftJoinAndSelect('message.post', 'post')
+            .where('((message.senderId = :userId AND message.receiverId = :friendId) OR (message.senderId = :friendId AND message.receiverId = :userId ))', {userId, friendId} )
+            .orderBy('message.createdAt', 'DESC')
+            .limit(parsedLimit + 1);
+
+        if (cursor) {
+            qb.andWhere('message.createdAt < :cursor', {
+                cursor: new Date(cursor),
+            });
+        }
+
+        const messages = await qb.getMany();
+        const hasMore = messages.length > parsedLimit;
+        const paginatedMessages = hasMore ? messages.slice(0, parsedLimit) : messages;
+        const nextCursor = hasMore ? paginatedMessages[parsedLimit - 1].createdAt : null;
+
+        return {
+            messages: paginatedMessages,
+            hasMore,
+            nextCursor,
+        };
     }
 }

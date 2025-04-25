@@ -39,10 +39,10 @@ import { Post } from './post.entity';
   
     @Column({
       type: 'enum',
-      enum: ['sent', 'delivered', 'read'],
+      enum: ['sent', 'read'],
       default: 'sent',
     })
-    status: 'sent' | 'delivered' | 'read';
+    status: 'sent' | 'read';
   
     @CreateDateColumn()
     createdAt: Date;

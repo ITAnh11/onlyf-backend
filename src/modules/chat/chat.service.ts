@@ -52,4 +52,20 @@ export class ChatService {
 
         return savedMessage;
     }
+
+    async saveMessage(data: any) {
+        const { senderId, receiverId, text, type, mediaUrl, createdAt } = data;
+
+        const message = this.messageRepository.create({
+            senderId: senderId,
+            receiverId: receiverId,
+            text: text,
+            type: type,
+            mediaUrl: mediaUrl,
+            status: 'sent',
+            
+        });
+
+        return await this.messageRepository.save(message);
+    }
 }

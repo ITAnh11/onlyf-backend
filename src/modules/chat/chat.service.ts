@@ -68,4 +68,15 @@ export class ChatService {
 
         return await this.messageRepository.save(message);
     }
+
+    async updateIsReadMessage(userId: number, senderId: number) {
+      await this.messageRepository
+        .createQueryBuilder('message')
+        .update()
+        .set({ status: 'read' })
+        .where('"message"."receiverId" = :receiverId', { receiverId: userId }) // Bao tên cột trong dấu ngoặc kép
+        .andWhere('"message"."senderId" = :senderId', { senderId })
+        .andWhere('"message"."status" = :status', { status: 'sent' })
+        .execute();
+    }
 }

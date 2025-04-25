@@ -127,4 +127,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     console.log(`📬 Message sent to user ${payload.recipientId}`);
   }
+
+
+  @SubscribeMessage('readMessage')
+  async handleReadMessage(
+    @MessageBody() payload: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = client.data.user;
+    console.log(`📖 User ${user.sub} read a message:`, payload);
+
+    this.chatService.updateIsReadMessage(
+      user.sub,
+      payload.senderId,
+    );
+
+    const recipientId = payload.senderId;
+    const recipientSocketId = await this.redisClient.get(`user:${recipientId}`);
+    if (!recipientSocketId) {
+      client.emit('error', 'Recipient not connected');
+      console.error(`❌ Recipient ${recipientId} not connected redis`);
+      return;
+    }
+
+    // Emit the read status to the recipient using `this.server`
+    const recipientSocket = this.server.sockets.sockets.get(recipientSocketId);
+    if (!recipientSocket) {
+      client.emit('error', 'Recipient not connected');
+      console.error(`❌ Recipient ${recipientId} not connected socket`);
+      return;
+    }
+
+    recipientSocket.emit('messageRead', {
+      messageId: payload.messageId,
+      senderId: user.sub,
+    });
+    console.log(`📖 Read status sent to user ${payload.senderId}`);
+  }
 }

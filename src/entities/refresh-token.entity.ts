@@ -44,6 +44,8 @@ export class RefreshToken {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToOne(() => FCMToken, (fcmToken) => fcmToken.refreshToken)
+  @OneToOne(() => FCMToken, (fcmToken) => fcmToken.refreshToken, {
+    onDelete: 'CASCADE',
+  })
   fcmToken: string;
 }

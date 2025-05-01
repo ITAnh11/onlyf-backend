@@ -80,52 +80,57 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() payload: any,
     @ConnectedSocket() client: Socket,
   ) {
-    const user = client.data.user;
-    console.log(`📩 User ${user.sub} sent a message:`, payload);
+    try {
+      const user = client.data.user;
+      console.log(`📩 User ${user.sub} sent a message:`, payload);
 
-    this.notificationService.notifyUserFCM(
-      payload.recipientId,
-      `New message from ${user.sub}`,
-      `You have a new message from ${user.sub}`,
-      {
-        senderId: user.sub.toString(),
-        senderName: user.name,
-        senderAvatar: user.urlPublicAvatar,
-        messageText: payload.message.text? payload.message.text : `New message`,
-    },
-      user.sub, 
-    );
+      this.notificationService.notifyUserFCM(
+        payload.recipientId,
+        `New message from ${user.sub}`,
+        `You have a new message from ${user.sub}`,
+        {
+          senderId: user.sub.toString(),
+          senderName: user.name,
+          senderAvatar: user.urlPublicAvatar,
+          messageType: payload.message.type,
+          messageText: payload.message.text? payload.message.text : `New message`,
+      },
+        user.sub, 
+      );
 
-    this.chatService.saveMessage({
-      senderId: user.sub,
-      receiverId: payload.recipientId,
-      text: payload.message.text,
-      type: payload.message.type,
-      mediaUrl: payload.mediaUrl,
-      createdAt: payload.message.createdAt,
-    });
+      this.chatService.saveMessage({
+        senderId: user.sub,
+        receiverId: payload.recipientId,
+        text: payload.message.text,
+        type: payload.message.type,
+        mediaUrl: payload.mediaUrl,
+        createdAt: payload.message.createdAt,
+      });
 
-    const recipientId = payload.recipientId;
-    const recipientSocketId = await this.redisClient.get(`user:${recipientId}`);
-    if (!recipientSocketId) {
-      client.emit('error', 'Recipient not connected');
-      console.error(`❌ Recipient ${recipientId} not connected`);
-      return;
+      const recipientId = payload.recipientId;
+      const recipientSocketId = await this.redisClient.get(`user:${recipientId}`);
+      if (!recipientSocketId) {
+        client.emit('error', 'Recipient not connected');
+        console.error(`❌ Recipient ${recipientId} not connected`);
+        return;
+      }
+
+      // Emit the message to the recipient using `this.server`
+      const recipientSocket = this.server.sockets.sockets.get(recipientSocketId);
+      if (!recipientSocket) {
+        client.emit('error', 'Recipient not connected');
+        console.error(`❌ Recipient ${recipientId} not connected`);
+        return;
+      }
+
+      recipientSocket.emit('receiveMessage', {
+        senderId: user.sub,
+        message: payload.message,
+      });
+      console.log(`📬 Message sent to user ${payload.recipientId}`);
+    } catch (error) {
+      console.error('❌ Error handling sendMessage:', error);
     }
-
-    // Emit the message to the recipient using `this.server`
-    const recipientSocket = this.server.sockets.sockets.get(recipientSocketId);
-    if (!recipientSocket) {
-      client.emit('error', 'Recipient not connected');
-      console.error(`❌ Recipient ${recipientId} not connected`);
-      return;
-    }
-
-    recipientSocket.emit('receiveMessage', {
-      senderId: user.sub,
-      message: payload.message,
-    });
-    console.log(`📬 Message sent to user ${payload.recipientId}`);
   }
 
 

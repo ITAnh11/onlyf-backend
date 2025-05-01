@@ -20,6 +20,7 @@ import { ChatGateway } from './modules/chat/chat.gateway';
 import { ChatModule } from './modules/chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ReactModule } from './modules/react/react.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { ReactModule } from './modules/react/react.module';
     FcmTokenModule,
     ChatModule,
     ReactModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway],

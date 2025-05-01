@@ -17,6 +17,7 @@ import { Notification } from './notification.entity';
 import { FCMToken } from './fcm-token.entity';
 import { Message } from './message.entity';
 import { React } from './react.entity';
+import { Premium } from './premium.entity';
 
 @Entity()
 export class User {
@@ -90,4 +91,7 @@ export class User {
 
   @OneToMany(() => React, (react) => react.user)
   reacts: React[];
+
+  @OneToOne(() => Premium, (premium) => premium.user)
+  premium: Premium;
 }

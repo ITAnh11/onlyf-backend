@@ -21,6 +21,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ReactModule } from './modules/react/react.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     ChatModule,
     ReactModule,
     PaymentModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway],

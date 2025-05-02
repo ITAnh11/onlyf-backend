@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/entities/post.entity';
 import { Repository } from 'typeorm';
 import { ReactService } from '../react/react.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class PostService {
@@ -11,14 +13,22 @@ export class PostService {
     private readonly postRepository: Repository<Post>,
 
     private readonly reactService: ReactService, // Inject ReactService
+
+    private readonly cloudinaryService: CloudinaryService, // Inject CloudinaryService
+
+    private readonly firebaseService: FirebaseService, // Inject FirebaseService
   ) {}
 
   async createPost(req: any, data: any): Promise<Post> {
     const userId = req.user.userId; // Assuming req.user contains the user object
     const newPost = this.postRepository.create({
+      type: data.type,
       caption: data.caption,
       urlPublicImage: data.urlPublicImage,
       pathImage: data.pathImage,
+      publicIdVideo: data.publicIdVideo,
+      urlPublicVideo: data.urlPublicVideo,
+      hlsUrlVideo: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload/f_auto,q_auto:eco/${data.publicId}.m3u8`,
       userId, // Assuming req.user contains the user object
     });
     try {
@@ -52,10 +62,7 @@ export class PostService {
     }
 
     qb.select([
-      'posts.id',
-      'posts.caption',
-      'posts.createdAt',
-      'posts.urlPublicImage',
+      'posts',
       'user.id',
       'profile.name',
       'profile.urlPublicAvatar',
@@ -69,8 +76,11 @@ export class PostService {
     const serialzedPosts = paginatedPosts.map((post) => ({
       id: post.id,
       caption: post.caption,
+      type: post.type,
       createdAt: post.createdAt,
       urlPublicImage: post.urlPublicImage,
+      urlPublicVideo: post.urlPublicVideo,
+      hlsUrlVideo: post.hlsUrlVideo,
       user: {
         id: post.user.id,
         profile: {
@@ -96,24 +106,27 @@ export class PostService {
   async deletePost(req: any, query: any) {
     const userId = req.user.userId;
     const postId = query.postId; // Assuming the post ID is passed in the request body
-    try {
-      const result = await this.postRepository.delete({
-        id: postId,
-        userId, // Sử dụng điều kiện đơn giản
-      });
+    const post = await this.postRepository.findOne({
+      where: { id: postId, userId },
+    });
 
-      if (result.affected === 0) {
-        throw new Error(
-          'Post not found or you do not have permission to delete it.',
-        );
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+
+    try {
+      if (post.type === 'video') {
+        const publicId = post.publicIdVideo;
+        await this.cloudinaryService.deleteVideo(publicId);
+      } else if (post.type === 'image') {
+        const pathImage = post.pathImage;
+        await this.firebaseService.deleteFile(pathImage);
       }
 
-      return {
-        message: 'Post deleted successfully',
-        statusCode: HttpStatus.OK,
-      };
+      await this.postRepository.delete(postId);
+      return { message: 'Post deleted successfully' };
     } catch (error) {
-      throw new Error('Error deleting post: ' + error.message);
+      throw new HttpException('Error deleting post', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -151,10 +164,7 @@ export class PostService {
     }
 
     qb.select([
-      'posts.id',
-      'posts.caption',
-      'posts.createdAt',
-      'posts.urlPublicImage',
+      'posts',
       'user.id',
       'profile.name',
       'profile.urlPublicAvatar',
@@ -168,8 +178,11 @@ export class PostService {
     const serialzedPosts = paginatedPosts.map((post) => ({
       id: post.id,
       caption: post.caption,
+      type: post.type,
       createdAt: post.createdAt,
       urlPublicImage: post.urlPublicImage,
+      urlPublicVideo: post.urlPublicVideo,
+      hlsUrlVideo: post.hlsUrlVideo,
       user: {
         id: post.user.id,
         profile: {

@@ -22,7 +22,9 @@ export class Post {
   @Column()
   userId: number;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   type: string; // 'image' | 'video'
 
   @Column({

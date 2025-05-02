@@ -22,6 +22,9 @@ export class Post {
   @Column()
   userId: number;
 
+  @Column()
+  type: string; // 'image' | 'video'
+
   @Column({
     nullable: true,
   })
@@ -36,6 +39,21 @@ export class Post {
     nullable: true,
   })
   pathImage: string;
+
+  @Column({
+    nullable: true,
+  })
+  urlPublicVideo: string;
+
+  @Column({
+    nullable: true,
+  })
+  publicIdVideo: string;
+
+  @Column({
+    nullable: true,
+  })
+  hlsUrlVideo: string;
 
   @CreateDateColumn()
   @Index()

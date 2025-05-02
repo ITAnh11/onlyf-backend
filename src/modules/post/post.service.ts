@@ -28,7 +28,7 @@ export class PostService {
       pathImage: data.pathImage,
       publicIdVideo: data.publicIdVideo,
       urlPublicVideo: data.urlPublicVideo,
-      hlsUrlVideo: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload/f_auto,q_auto:eco/${data.publicId}.m3u8`,
+      hlsUrlVideo: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload/f_auto,q_auto:eco/${data.publicIdVideo}.m3u8`,
       userId, // Assuming req.user contains the user object
     });
     try {

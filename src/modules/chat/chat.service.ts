@@ -106,9 +106,26 @@ export class ChatService {
         const hasMore = messages.length > parsedLimit;
         const paginatedMessages = hasMore ? messages.slice(0, parsedLimit) : messages;
         const nextCursor = hasMore ? paginatedMessages[parsedLimit - 1].createdAt : null;
+        const formattedMessages = paginatedMessages.map((message) => {
+            return {
+                id: message.id,
+                senderId: message.senderId,
+                receiverId: message.receiverId,
+                message: {
+                    text: message.text,
+                    type: message.type,
+                    mediaUrl: message.mediaUrl,
+                    status: message.status,
+                    createdAt: message.createdAt,
+                    updatedAt: message.updatedAt,
+                },
+                postId: message.postId,
+                post: message.post
+            };
+        });
 
         return {
-            messages: paginatedMessages,
+            messages: formattedMessages,
             hasMore,
             nextCursor,
         };

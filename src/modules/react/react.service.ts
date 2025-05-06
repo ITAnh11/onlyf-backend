@@ -23,7 +23,7 @@ export class ReactService {
     async createReact(req: any) {
         const userId = req.user.userId;
 
-        const userprofile = await this.userProfileService.getProfile({user: {userId}});
+        const userprofile = await this.userProfileService.getProfileByUserId(userId);
 
         const { postId, type } = req.body;
 

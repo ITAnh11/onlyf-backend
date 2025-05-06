@@ -14,6 +14,7 @@ import { UserModule } from '../user/user.module';
     UserModule,
     UserprofileModule,
     NotificationModule,
+    UserModule,
   ],
   controllers: [FriendController],
   providers: [FriendService],

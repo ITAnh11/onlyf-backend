@@ -124,4 +124,28 @@ export class UserService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  async isPremium(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['premium'],
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    if (!user.premium) {
+      return false;
+    }
+
+    const currentDate = new Date();
+    const expireDate = new Date(user.premium.expireAt);
+
+    if (user.premium.isPremium && expireDate > currentDate) {
+      return true;
+    }
+    
+    return false;
+  }
 }

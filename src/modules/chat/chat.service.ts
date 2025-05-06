@@ -20,7 +20,7 @@ export class ChatService {
     async replyToPost(req: any) {
         const userId = req.user.userId; // Assuming you have userId in the request object
 
-        const userprofile = await this.userProfileService.getProfile({user: {userId}});
+        const userprofile = await this.userProfileService.getProfileByUserId(userId);
 
         const { receiverId, postId, text } = req.body;
 

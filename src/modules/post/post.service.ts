@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ReactService } from '../react/react.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FirebaseService } from '../firebase/firebase.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class PostService {
@@ -17,10 +18,29 @@ export class PostService {
     private readonly cloudinaryService: CloudinaryService, // Inject CloudinaryService
 
     private readonly firebaseService: FirebaseService, // Inject FirebaseService
+
+    private readonly userService: UserService, // Inject UserService
   ) {}
 
+  async canUploadPost(userId: number, type: string): Promise<boolean> {
+    const isPremium = await this.userService.isPremium(userId);
+
+    if (type === 'video' && !isPremium) {
+      return false;
+    }
+
+    return true;
+  }
+
   async createPost(req: any, data: any): Promise<Post> {
+    
+    const canUpload = await this.canUploadPost(req.user.userId, data.type);
+    if (!canUpload) {
+      throw new HttpException('You need to be a premium user to upload videos', HttpStatus.FORBIDDEN);
+    }
+
     const userId = req.user.userId; // Assuming req.user contains the user object
+
     const newPost = this.postRepository.create({
       type: data.type,
       caption: data.caption,

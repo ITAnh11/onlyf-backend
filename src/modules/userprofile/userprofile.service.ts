@@ -10,7 +10,7 @@ export class UserprofileService {
     @InjectRepository(UserProfile)
     private readonly userProfileRepository: Repository<UserProfile>,
 
-    private readonly firebaseService: FirebaseService,
+    private readonly firebaseService: FirebaseService
   ) {}
 
   async createProfile(user: any, profileData: any) {
@@ -28,9 +28,7 @@ export class UserprofileService {
     });
   }
 
-  async getProfile(req: any) {
-    const user = req.user;
-    const userId = user.userId;
+  async getProfileByUserId(userId: number) {
     const profile = await this.userProfileRepository.findOne({
       where: { userId },
       relations: ['user'],
@@ -47,6 +45,49 @@ export class UserprofileService {
     });
 
     return profile;
+  }
+
+  async getProfile(req: any) {
+    const user = req.user;
+    const userId = user.userId;
+    const profile = await this.userProfileRepository.createQueryBuilder('userProfile')
+      .leftJoinAndSelect('userProfile.user', 'user')
+      .leftJoinAndSelect('user.premium', 'premium')
+      .where('userProfile.userId = :userId', { userId })
+      .select([
+        'userProfile.id',
+        'userProfile.username',
+        'userProfile.name',
+        'userProfile.dob',
+        'userProfile.phone',
+        'userProfile.urlPublicAvatar',
+        'userProfile.pathAvatar',
+        'user.id',
+        'user.email',
+        'premium.id',
+        'premium.isPremium',
+        'premium.expireAt',
+      ])
+      .getOne();
+    if (!profile) {
+        return new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+      }
+
+    const serilizedProfile = {
+      id: profile.user.id,
+      email: profile.user.email,
+      username: profile.username,
+      name: profile.name,
+      dob: profile.dob,
+      phone: profile.phone,
+      urlPublicAvatar: profile.urlPublicAvatar,
+      pathAvatar: profile.pathAvatar,
+      isPremium: profile.user.premium?.isPremium || false,
+      premiumExpireAt: profile.user.premium?.expireAt || null,
+      premiumId: profile.user.premium?.id || null,
+    };
+
+    return serilizedProfile;
   }
 
   async updateProfile(req: any, data: any) {

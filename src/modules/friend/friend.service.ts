@@ -9,9 +9,13 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserprofileService } from '../userprofile/userprofile.service';
 import { NotificationService } from '../notification/notification.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class FriendService {
+
+  private readonly MAX_FRIENDS: number = parseInt(process.env.MAX_FRIENDS || '20');
+
   constructor(
     @InjectRepository(Friend)
     private readonly friendRepository: Repository<Friend>,
@@ -25,9 +29,33 @@ export class FriendService {
     private readonly userProfileService: UserprofileService,
 
     private readonly notificationService: NotificationService,
+
+    private readonly userService: UserService,
   ) {}
 
+  async canAddMoreFriends(userId: number): Promise<boolean> {
+    const isPremium = await this.userService.isPremium(userId);
+    if (isPremium) {
+      return true;
+    }
+
+    const friendCount = await this.friendRepository.count({
+      where: { userId },
+    });
+
+    return friendCount < this.MAX_FRIENDS;
+  }
+
   async sendFriendRequest(req: any, query: any): Promise<FriendRequest> {
+
+    const canAddMoreFriends = await this.canAddMoreFriends(req.user.userId);
+    if (!canAddMoreFriends) {
+      throw new HttpException(
+        `You need upgrade to premium to add more friends. Please unfriend someone to add a new friend.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const userId = req.user.userId; // Assuming req.user contains the user object
     const receiverId = parseInt(query.receiverId); // Assuming the receiver ID is passed in the request body
 
@@ -78,7 +106,9 @@ export class FriendService {
     });
     try {
 
-      const senderProfile = await this.userProfileService.getProfile({user: {userId}});
+      const senderProfile = await this.userProfileService.getProfileByUserId(
+        userId,
+      );
 
       const savedRequest = await this.friendRequestRepository.save(
         newFriendRequest,
@@ -104,6 +134,14 @@ export class FriendService {
   }
 
   async acceptFriendRequest(req: any, query: any) {
+    const canAddMoreFriends = await this.canAddMoreFriends(req.user.userId);
+    if (!canAddMoreFriends) {
+      throw new HttpException(
+        `You need upgrade to premium to add more friends. Please unfriend someone to add a new friend.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const userId = req.user.userId; // Assuming req.user contains the user object
     const requestId = parseInt(query.requestId); // Assuming the request ID is passed in the request body
 

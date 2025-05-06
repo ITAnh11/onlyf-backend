@@ -46,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userId = payload.sub;
       client.data.user = payload;
 
-      const userprofile = await this.userProfileService.getProfile({ user: { userId } });
+      const userprofile = await this.userProfileService.getProfileByUserId(userId);
 
       client.data.user = {
         ...payload,

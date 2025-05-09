@@ -7,9 +7,10 @@ import { ReactModule } from '../react/react.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { UserModule } from '../user/user.module';
+import { FriendModule } from '../friend/friend.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), ReactModule, FirebaseModule, CloudinaryModule, UserModule],
+  imports: [TypeOrmModule.forFeature([Post]), ReactModule, FirebaseModule, CloudinaryModule, UserModule, FriendModule],
   controllers: [PostController],
   providers: [PostService],
   exports: [PostService],

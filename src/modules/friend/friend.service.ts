@@ -381,4 +381,16 @@ export class FriendService {
       throw new Error('Error unfriending user: ' + error.message);
     }
   }
+
+  async isFriend(userId: number, friendId: number): Promise<boolean> {
+    const friendship = await this.friendRepository
+      .createQueryBuilder('friend')
+      .where(
+        '(friend.userId = :userId AND friend.friendId = :friendId) OR (friend.userId = :friendId AND friend.friendId = :userId)',
+        { userId, friendId },
+      )
+      .getOne();
+  
+    return !!friendship; // Trả về true nếu tồn tại mối quan hệ bạn bè, ngược lại trả về false
+  }
 }

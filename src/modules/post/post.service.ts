@@ -6,6 +6,7 @@ import { ReactService } from '../react/react.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { UserService } from '../user/user.service';
+import { FriendService } from '../friend/friend.service';
 
 @Injectable()
 export class PostService {
@@ -20,6 +21,8 @@ export class PostService {
     private readonly firebaseService: FirebaseService, // Inject FirebaseService
 
     private readonly userService: UserService, // Inject UserService
+
+    private readonly friendService: FriendService, // Inject FriendService
   ) {}
 
   async canUploadPost(userId: number, type: string): Promise<boolean> {
@@ -229,5 +232,70 @@ export class PostService {
     return await this.postRepository.findOne({
       where: { id: postId },
     });
+  }
+
+  async generateShareLink(req: any, query: any) {
+    const postId = query.postId; // Assuming the post ID is passed in the request body
+    const ownerId = query.ownerId; // Assuming the owner ID is passed in the request body
+    const post = await this.postRepository.findOne({
+      where: { id: postId, userId: ownerId },
+    });
+
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+
+    const queryParams = new URLSearchParams({
+      postId: post.id.toString(),
+      ownerId: post.userId.toString(),
+    });
+
+    return {
+      success: true,
+      message: 'Share link generated successfully',
+      statusCode: HttpStatus.OK,
+      shareLink: `${process.env.DOMAIN_FIREBASE_HOSTING}/share/post?${queryParams.toString()}`,
+    }
+  } 
+
+  async getContentPost(req: any, query: any) {
+    const userId = req.user.userId;
+    const postId = query.postId; // Assuming the post ID is passed in the request body
+    const ownerId = query.ownerId; // Assuming the friend ID is passed in the request body
+
+    // check is userId is a friend of ownerId
+    const isFriend = await this.friendService.isFriend(
+      userId,
+      ownerId,
+    );
+    if (!isFriend) {
+      throw new HttpException('You are not friends with this user', HttpStatus.FORBIDDEN);
+    }
+    const post = await this.postRepository.findOne({
+      where: { id: postId, userId: ownerId },
+      relations: ['user', 'user.profile'],
+    });
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+
+    const serialzedPost = {
+      id: post.id,
+      caption: post.caption,
+      type: post.type,
+      createdAt: post.createdAt,
+      urlPublicImage: post.urlPublicImage,
+      urlPublicVideo: post.urlPublicVideo,
+      hlsUrlVideo: post.hlsUrlVideo,
+      user: {
+        id: post.user.id,
+        profile: {
+          name: post.user.profile.name,
+          urlPublicAvatar: post.user.profile.urlPublicAvatar,
+        } 
+      },
+    };
+
+    return serialzedPost;
   }
 }

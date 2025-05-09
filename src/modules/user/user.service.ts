@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserprofileService } from '../userprofile/userprofile.service';
 
+
 @Injectable()
 export class UserService {
   constructor(
@@ -147,5 +148,40 @@ export class UserService {
     }
     
     return false;
+  }
+
+  async generateInviteLink(req: any) {
+    const userId = req.user.userId;
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const queryParams = new URLSearchParams({
+      userId: user.id.toString(),
+      username: user.profile.username,
+      name: user.profile.name,
+      avatar: user.profile.urlPublicAvatar,
+    });
+
+    const inviteLink = `${process.env.DOMAIN_FIREBASE_HOSTING}/invite/?${queryParams.toString()}`;
+
+    return {
+      success: true,
+      message: 'Invite link generated successfully',
+      statusCode: HttpStatus.OK,
+      inviteLink,
+    };
   }
 }

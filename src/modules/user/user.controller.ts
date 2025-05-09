@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,5 +20,11 @@ export class UserController {
   @Post('reset-password')
   async resetPassword(@Req() req, @Body() data: PasswordDto) {
     return await this.userService.resetPassword(req, data);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('generate-invite-link')
+  async generateInviteLink(@Req() req) {
+    return await this.userService.generateInviteLink(req);
   }
 }

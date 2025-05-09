@@ -39,4 +39,16 @@ export class PostController {
   async getPosts(@Request() req, @Query() query: any) {
     return this.postService.getPosts(req, query);
   }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('generate-share-link')
+  async generateShareLink(@Request() req, @Query() query: any) {
+    return this.postService.generateShareLink(req, query);
+  }
+  
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('get-content-post')
+  async getContentPost(@Request() req, @Query() query: any) {
+    return this.postService.getContentPost(req, query);
+  }
 }

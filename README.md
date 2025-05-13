@@ -28,9 +28,28 @@
 
 ## Project setup
 
+### Set up lib
+
 ```bash
 $ npm install
 ```
+### Set up Postgres
+
+run docker
+```bash
+$ docker compose up -d
+```
+
+unzip file database demo
+```bash
+$ unzip src/data/data.zip -d src/data/
+```
+
+import data to database
+```bash
+$ cat src/data/data.sql | docker exec -i postgres_onlyf psql -U admin -d onlyf
+```
+
 
 ## Compile and run the project
 

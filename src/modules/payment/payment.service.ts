@@ -47,8 +47,8 @@ export class PaymentService {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.NGROK_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NGROK_URL}/payment/cancel`,
+            success_url: `${process.env.DOMAIN_FIREBASE_HOSTING}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.DOMAIN_FIREBASE_HOSTING}/payment/cancel`,
             metadata: {
                 userId: userId.toString(),
                 type: type,

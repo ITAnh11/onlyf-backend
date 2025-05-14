@@ -44,7 +44,25 @@ export class UserprofileService {
       },
     });
 
-    return profile;
+    if (!profile) {
+      return null;
+    }
+
+    const serilizedProfile = {
+      id: profile.user.id,
+      user: {
+        id: profile.user.id,
+        email: profile.user.email,
+      },
+      username: profile.username,
+      name: profile.name,
+      dob: profile.dob? profile.dob : '',
+      phone: profile.phone? profile.phone : '',
+      urlPublicAvatar: profile.urlPublicAvatar? profile.urlPublicAvatar : '',
+      pathAvatar: profile.pathAvatar? profile.pathAvatar : '',
+    };
+
+    return serilizedProfile;
   }
 
   async getProfile(req: any) {

@@ -103,7 +103,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         receiverId: payload.recipientId,
         text: payload.message.text,
         type: payload.message.type,
-        mediaUrl: payload.mediaUrl,
+        mediaUrl: payload.message.mediaUrl,
         createdAt: payload.message.createdAt,
       });
 

@@ -35,33 +35,45 @@ $ npm install
 ```
 ### Set up Postgres
 
-run docker
-```bash
-$ docker compose up -d
-```
+1. run docker
+  ```bash
+  $ docker compose up -d
+  ```
 
-unzip file database demo
-```bash
-$ unzip src/data/data.zip -d src/data/
-```
+2. create file .env like .env.example  
 
-import data to database
-```bash
-$ cat src/data/data.sql | docker exec -i postgres_onlyf psql -U admin -d onlyf
-```
+3. create new terminal run server to gen table
+  ```bash
+  $ npm run start:dev
+  ```
 
+4. unzip file database demo
+  ```bash
+  $ unzip src/data/data.zip -d src/data/
+  ```
+
+5. import data to database
+  ```bash
+  $ cat src/data/data.sql | docker exec -i postgres_onlyf psql -U admin -d onlyf
+  ```
 
 ## Compile and run the project
 
-```bash
-# development
-$ npm run start
+1. run docker
+  ```bash
+  $ docker compose up -d
+  ```
 
-# watch mode
-$ npm run start:dev
+2. run server
+  ```bash
+  # development
+  $ npm run start
 
-# production mode
-$ npm run start:prod
+  # watch mode
+  $ npm run start:dev
+
+  # production mode
+  $ npm run start:prod
 ```
 
 ## Run tests

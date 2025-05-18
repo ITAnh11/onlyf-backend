@@ -41,7 +41,7 @@
 
 ## Description
 
-Backend for a social networking application named **OnlyF**, designed for close friends to share memorable daily moments.  
+Frontend app android for a social networking application named **OnlyF**, designed for close friends to share memorable daily moments.  
 The app is inspired by [Locket](https://www.locket.vn/).
 
 - ✅ User registration, login, and authentication with JWT
@@ -99,15 +99,16 @@ This project uses the following technologies
     <a href="https://www.docker.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="docker" width="40" height="40"/> </a> 
     <a href="https://firebase.google.com/" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg" alt="git" width="40" height="40"/> </a>   
   </a>
-- Other services: Firebase, Cloudinary, Stripe
+- Other services: Firebase, Cloudinary, Stripe, Google Admob
   <p align="left"> 
     <a href="https://firebase.google.com/" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg" width="40" height="40"/> </a> 
     <a href="https://cloudinary.com/" target="_blank" rel="noreferrer"> <img src="https://cdn.brandfetch.io/idX0l-p4Rn/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" width="40" height="40"/> </a> 
     <a href="https://stripe.com/" target="_blank" rel="noreferrer"> <img src="https://cdn.brandfetch.io/idxAg10C0L/w/800/h/380/theme/dark/logo.png?c=1dxbfHSJFAPEGdCLU4o5B" height="40"/> </a> 
+    <a href="https://admob.google.com/intl/vi/home/" target="_blank" rel="noreferrer"> <img src="https://img.icons8.com/?size=100&id=J3caGozFXTk1&format=png&color=000000" height="40"/> </a> 
   </a>
 </p>
 
-## Project setup backend on codespace Github
+## Project setup frontend on codespace Github
 
 ### Create codespace
 
@@ -193,6 +194,8 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+3. Public port 3000 on codespace
 
 ## Deployment
 

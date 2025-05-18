@@ -32,6 +32,7 @@
 ## Table of Contents
 
 - [Description](#introduction)
+- [All related repos](#all-related-repos)
 - [Demo](#demo)
 - [Technologies Used](#technologies-used)
 - [Project setup on codespace Github](#project-setup-on-codespace-github)
@@ -57,6 +58,13 @@ The app is inspired by [Locket](https://www.locket.vn/).
 - ✅ Advertisement system
 - ✅ Premium account top-up
 - ✅ Notifications
+
+## All related repos
+
+- [Frontend-mobile](https://github.com/ITAnh11/onlyf-mobile)
+- [Backend](https://github.com/ITAnh11/onlyf-backend)
+- [Generate data](https://github.com/ITAnh11/generate_data_onlyf)
+- [Firebase hosting](https://github.com/ITAnh11/onlyf-mobile-hosting-firebase)
 
 ## Demo
 
@@ -108,7 +116,7 @@ This project uses the following technologies
   </a>
 </p>
 
-## Project setup frontend on codespace Github
+## Project setup on codespace Github
 
 ### Create codespace
 
@@ -196,6 +204,8 @@ $ npm run start:prod
 ```
 
 3. Public port 3000 on codespace
+
+## Project setup frontend at repo
 
 ## Deployment
 

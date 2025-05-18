@@ -122,6 +122,14 @@ This project uses the following technologies
 
 Fork repo -> Code -> choose options codespace -> run codespace
 
+Or clone to local
+
+```bash
+$ git clone https://github.com/ITAnh11/onlyf-backend.git
+```
+
+If you run on local you need use [Ngrok](https://ngrok.com/) to public url
+
 ### Set up lib
 
 ```bash
@@ -147,9 +155,9 @@ $ npm install
    Fill value from web to `.env`
 
 5. Stripe  
-   Free plan by [Stripe](<[https://cloudinary.com/](https://stripe.com/)>)  
+   Free plan by [Stripe](https://stripe.com/)  
    Fill value STRIPE_SECRET_KEY from web to `.env`  
-   Search `webhook` -> Add destination -> Select event `checkout.session.completed` -> Endpoint URL `https://your.domaname.codespace/payment/webhook`  
+   Search `webhook` -> Add destination -> Select event `checkout.session.completed` -> Endpoint URL `https://your.server.url/payment/webhook`  
    Fill value STRIPE_WEBHOOK_SECRET from web to `.env`
 
 6. Firebase hosting  

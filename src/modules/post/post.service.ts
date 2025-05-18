@@ -248,6 +248,7 @@ export class PostService {
     const queryParams = new URLSearchParams({
       postId: post.id.toString(),
       ownerId: post.userId.toString(),
+      createdAt: post.createdAt.toString(),
     });
 
     return {
@@ -294,7 +295,11 @@ export class PostService {
           urlPublicAvatar: post.user.profile.urlPublicAvatar,
         } 
       },
+      reacts: {},
     };
+
+    const reacts = await this.reactService.getReactsByPostId(post.id);
+    serialzedPost.reacts = reacts;
 
     return serialzedPost;
   }

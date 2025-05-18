@@ -383,6 +383,9 @@ export class FriendService {
   }
 
   async isFriend(userId: number, friendId: number): Promise<boolean> {
+    if (userId === friendId) {
+      return true; // Không thể là bạn bè với chính mình
+    }
     const friendship = await this.friendRepository
       .createQueryBuilder('friend')
       .where(

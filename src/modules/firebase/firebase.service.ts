@@ -36,6 +36,7 @@ export class FirebaseService {
     data?: Record<string, any>, // nhận bất kỳ kiểu gì
   ): Promise<void> {
     try {
+      console.log('Body:', body);
       console.log('Raw data:', data);
 
       const message = {

@@ -92,6 +92,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           senderId: user.sub.toString(),
           senderName: user.name,
           senderAvatar: user.urlPublicAvatar,
+          senderUsername: user.username,
           messageType: payload.message.type,
           messageText: payload.message.text? payload.message.text : `New message`,
       },

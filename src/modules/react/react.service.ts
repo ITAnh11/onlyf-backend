@@ -49,6 +49,7 @@ export class ReactService {
                 senderId: userId.toString(),
                 senderName: userprofile?.name,
                 senderAvatar: userprofile?.urlPublicAvatar,
+                senderUsername: userprofile?.username,
                 postId: postId.toString(),
                 reactType: type,
             },

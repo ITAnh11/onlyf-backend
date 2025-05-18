@@ -122,6 +122,7 @@ export class FriendService {
           senderId: userId.toString(),
           senderName: senderProfile?.name,
           senderAvatar: senderProfile?.urlPublicAvatar,
+          senderUsername: senderProfile?.username,
         },
         userId
       );
@@ -136,7 +137,7 @@ export class FriendService {
   async acceptFriendRequest(req: any, query: any) {
     const canAddMoreFriends = await this.canAddMoreFriends(req.user.userId);
     if (!canAddMoreFriends) {
-      throw new HttpException(
+      return new HttpException(
         `You need upgrade to premium to add more friends. Please unfriend someone to add a new friend.`,
         HttpStatus.BAD_REQUEST,
       );
@@ -152,14 +153,14 @@ export class FriendService {
       });
 
       if (!friendRequest) {
-        throw new HttpException(
+        return new HttpException(
           'Friend request not found or you do not have permission to accept it.',
           HttpStatus.NOT_FOUND,
         );
       }
 
       if (friendRequest.status !== FriendRequestStatus.PENDING) {
-        throw new HttpException(
+        return new HttpException(
           'Friend request is not pending.',
           HttpStatus.BAD_REQUEST,
         );
@@ -179,6 +180,24 @@ export class FriendService {
       await this.friendRequestRepository.update(requestId, {
         status: FriendRequestStatus.ACCEPTED,
       });
+
+      const senderProfile = await this.userProfileService.getProfileByUserId(
+        userId,
+      );
+
+      // Thong báo cho người gửi yêu cầu kết bạn
+      this.notificationService.notifyUserFCM(
+        userId,
+        'Friend Request Accepted',
+        `${senderProfile?.name} has accepted your friend request.`,
+        {
+          senderId: userId.toString(),
+          senderName: senderProfile?.name,
+          senderAvatar: senderProfile?.urlPublicAvatar,
+          senderUsername: senderProfile?.username,
+        },
+        userId
+      );
 
       return {
         message: 'Friend request accepted successfully',

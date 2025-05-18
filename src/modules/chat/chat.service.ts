@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
 
 import { UserprofileService } from '../userprofile/userprofile.service';
+import { send } from 'process';
 
 @Injectable()
 export class ChatService {
@@ -43,6 +44,7 @@ export class ChatService {
                 senderId: userId.toString(),
                 senderName: userprofile?.name,
                 senderAvatar: userprofile?.urlPublicAvatar,
+                senderUsername: userprofile?.username,
                 postId: postId.toString(),
                 messageId: savedMessage.id.toString(),
                 messageText: text,

@@ -86,8 +86,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       this.notificationService.notifyUserFCM(
         payload.recipientId,
-        `New message from ${user.sub}`,
-        `You have a new message from ${user.sub}`,
+        `New message`,
+        `${user.name}: ${payload.message.type === 'text' ? payload.message.text : payload.message.type==='image' ? 'Image' : 'Video'}`,
         {
           senderId: user.sub.toString(),
           senderName: user.name,

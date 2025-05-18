@@ -43,8 +43,8 @@ export class ReactService {
 
         this.notificationService.notifyUserFCM(
             post.userId,
-            'New React',
-            `${userprofile?.name} reacted to your post`,
+            'New Reaction',
+            `${userprofile?.name} reacted: ${type} to your post`,
             {
                 senderId: userId.toString(),
                 senderName: userprofile?.name,

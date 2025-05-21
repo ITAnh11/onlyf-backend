@@ -44,14 +44,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         secret: process.env.JWT_ACCESS_SECRET,
       });
       const userId = payload.sub;
-      client.data.user = payload;
-
       const userprofile = await this.userProfileService.getProfileByUserId(userId);
 
       client.data.user = {
         ...payload,
         urlPublicAvatar: userprofile?.urlPublicAvatar,
         name: userprofile?.name,
+        username: userprofile?.username,
       }
 
       // Store the socket ID in Redis with userId as the key
@@ -87,7 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.notificationService.notifyUserFCM(
         payload.recipientId,
         `New message`,
-        `${user.name}: ${payload.message.type === 'text' ? payload.message.text : payload.message.type==='image' ? 'Image' : 'Video'}`,
+        `${user.name}: ${payload.message.type === 'text' ? payload.message.text : payload.message.type==='image' ? 'Sent you the image' : 'Sent you the video'}`,
         {
           senderId: user.sub.toString(),
           senderName: user.name,

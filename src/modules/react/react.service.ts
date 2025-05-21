@@ -72,5 +72,5 @@ export class ReactService {
             type: result.react_type,
             count: Number(result.count), // Hoặc parseInt(result.count, 10)
         }));
-        }
+    }
 }

@@ -19,4 +19,15 @@ export class ChatController {
     return await this.chatService.getMessages(req, query);
   }
 
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('get-last-message-of-all-chats')
+  async getLastMessageOfAllChats(@Request() req: any) {
+    return await this.chatService.getLastMessageOfAllChats(req);
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('get-last-message-of-all-chats-v2')
+  async getLastMessageOfAllChatsV2(@Request() req: any) {
+    return await this.chatService.getLastMessageOfAllChatsV2(req);
+  }
 }

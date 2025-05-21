@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from 'src/entities/message.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
 
 import { UserprofileService } from '../userprofile/userprofile.service';
-import { send } from 'process';
+import { Friend } from 'src/entities/friend.entity';
 
 @Injectable()
 export class ChatService {
@@ -16,6 +16,11 @@ export class ChatService {
         private readonly notificationService: NotificationService,
 
         private readonly userProfileService: UserprofileService,
+
+        @InjectRepository(Friend)
+        private readonly friendRepository: Repository<Friend>,
+
+        private dataSource: DataSource
     ) {}
 
     async replyToPost(req: any) {
@@ -132,4 +137,100 @@ export class ChatService {
             nextCursor,
         };
     }
+
+    async getLastMessageOfAllChats(req: any) {
+        const userId = req.user.userId;
+        try {
+            const latestMessages = await this.messageRepository
+            .createQueryBuilder('message')
+            .distinctOn([
+                'LEAST(message.senderId, message.receiverId)',
+                'GREATEST(message.senderId, message.receiverId)',
+            ])
+            .leftJoinAndSelect('message.sender', 'sender')
+            .leftJoinAndSelect('message.receiver', 'receiver')
+            .leftJoinAndSelect('message.post', 'post')
+            .where('message.senderId = :userId OR message.receiverId = :userId', { userId })
+            .orderBy('LEAST(message.senderId, message.receiverId)', 'ASC')
+            .addOrderBy('GREATEST(message.senderId, message.receiverId)', 'ASC')
+            .addOrderBy('message.createdAt', 'DESC')
+            .getMany();
+
+            const formattedMessages = latestMessages.map((message) => ({
+            id: message.id,
+            friendId: message.senderId === userId ? message.receiverId : message.senderId,
+            senderId: message.senderId,
+            receiverId: message.receiverId,
+            message: {
+                text: message.text,
+                type: message.type,
+                mediaUrl: message.mediaUrl,
+                status: message.status,
+                createdAt: message.createdAt,
+                updatedAt: message.updatedAt,
+            },
+            postId: message.postId,
+            post: message.post
+            }));
+
+            return formattedMessages;
+        } catch (error) {
+            console.error('Error fetching last messages:', error);
+            throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getLastMessageOfAllChatsV2(req: any) {
+  const userId = req.user.userId;
+  try {
+    const result = await this.dataSource.query(
+      `
+      WITH latest_messages AS (
+        SELECT DISTINCT ON (
+            LEAST(m."senderId", m."receiverId"),
+            GREATEST(m."senderId", m."receiverId")
+        )
+            m.*
+        FROM message m
+        ORDER BY
+            LEAST(m."senderId", m."receiverId") ASC,
+            GREATEST(m."senderId", m."receiverId") ASC,
+            m."createdAt" DESC
+        )
+        SELECT
+        f.id as friend_id,
+        f."userId" as friend_userId,
+        f."friendId" as friend_friendId,
+        lm.id as message_id,
+        lm."senderId" as message_senderId,
+        lm."receiverId" as message_receiverId,
+        lm.text as message_text,
+        lm.type as message_type,
+        lm."mediaUrl" as message_mediaUrl,
+        lm.status as message_status,
+        lm."createdAt" as message_createdAt,
+        lm."updatedAt" as message_updatedAt,
+        lm."postId" as message_postId,
+        p.*
+        FROM "friend" f
+        JOIN "user" u ON u.id = f."friendId"
+        LEFT JOIN latest_messages lm ON (
+        (f."userId" = lm."senderId" AND f."friendId" = lm."receiverId")
+        OR
+        (f."userId" = lm."receiverId" AND f."friendId" = lm."senderId")
+        )
+        LEFT JOIN post p ON p.id = lm."postId"
+        WHERE f."userId" = $1
+        ORDER BY COALESCE(lm."createdAt", '1970-01-01') DESC;
+      `,
+      [userId]
+    );
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching last messages with friends:', error);
+    throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
 }

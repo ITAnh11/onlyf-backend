@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from 'src/entities/message.entity';
 import { NotificationModule } from '../notification/notification.module';
 import { UserprofileModule } from '../userprofile/userprofile.module';
+import { Friend } from 'src/entities/friend.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Message]), NotificationModule, UserprofileModule], // Add your entities here
+  imports: [TypeOrmModule.forFeature([Message, Friend]), NotificationModule, UserprofileModule], // Add your entities here
   controllers: [ChatController],
   providers: [ChatService],
   exports: [ChatService],

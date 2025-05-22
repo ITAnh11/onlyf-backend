@@ -187,7 +187,7 @@ export class FriendService {
 
       // Thong báo cho người gửi yêu cầu kết bạn
       this.notificationService.notifyUserFCM(
-        userId,
+        friendRequest.senderId,
         'Friend Request Accepted',
         `${senderProfile?.name} has accepted your friend request.`,
         {

@@ -36,17 +36,20 @@ export class NotificationService {
         }
       
         for (const token of deviceTokens) {
-          try {
             this.firebaseService.sendFCM(
               token.token,
               title,
               body,
-              data, // Truyền `data` trực tiếp, không cần JSON.stringify
-            );
-          } catch (error) {
-            console.error('Error sending FCM:', error);
+              data,
+            ).catch(async (error: any) => {
+              console.error('Error sending FCM:', error);
+
+              if (error.errorInfo?.code === 'messaging/registration-token-not-registered') {
+                await this.fcmTokenRepository.delete(token.id);
+                console.log('Removed invalid FCM token:', token.token);
+              }
+            });
           }
-        }
       
         // Save notification to database
         await this.saveNotification(userId, title, body, data, senderId);

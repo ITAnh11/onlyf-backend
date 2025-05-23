@@ -43,7 +43,7 @@ export class ChatService {
 
         this.notificationService.notifyUserFCM(
             receiverId,
-            'New reply',
+            'New reply to your post',
             `${userprofile?.name}: ${text}`,
             {
                 senderId: userId.toString(),

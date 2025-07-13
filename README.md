@@ -67,6 +67,7 @@ The app is inspired by [Locket](https://www.locket.vn/).
 - [Firebase hosting](https://github.com/ITAnh11/onlyf-mobile-hosting-firebase)
 
 ## Demo
+[Video demo](https://youtu.be/781RO8JKoLo?si=_dxxot7U0Kzvo61w)
 
 ## Technologies Used
 
